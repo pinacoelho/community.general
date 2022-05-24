@@ -12,11 +12,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: ini_file
-short_description: Tweak settings in INI files
+module: stanza_file
+short_description: Tweak settings in stanza files
 extends_documentation_fragment: files
 description:
-     - Manage (add, remove, change) individual settings in an INI-style file without having
+     - Manage (add, remove, change) individual settings in a stanza-style file without having
        to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
      - Adds missing sections if they don't exist.
      - Before Ansible 2.0, comments are discarded when the source file is read, and therefore will not show up in the destination file.
@@ -25,14 +25,14 @@ description:
 options:
   path:
     description:
-      - Path to the INI-style file; this file is created if required.
+      - Path to the stanza-style file; this file is created if required.
       - Before Ansible 2.3 this option was only usable as I(dest).
     type: path
     required: true
     aliases: [ dest ]
   section:
     description:
-      - Section name in INI file. This is added if C(state=present) automatically when
+      - Section name in stanza file. This is added if C(state=present) automatically when
         a single value is being set.
       - If left empty or set to C(null), the I(option) will be placed before the first I(section).
       - Using C(null) is also required if the config format does not support sections.
@@ -114,7 +114,7 @@ author:
 EXAMPLES = r'''
 # Before Ansible 2.3, option 'dest' was used instead of 'path'
 - name: Ensure "fav=lemonade is in section "[drinks]" in specified file
-  community.general.ini_file:
+  community.general.stanza_file:
     path: /etc/conf
     section: drinks
     option: fav
@@ -123,7 +123,7 @@ EXAMPLES = r'''
     backup: yes
 
 - name: Ensure "temperature=cold is in section "[drinks]" in specified file
-  community.general.ini_file:
+  community.general.stanza_file:
     path: /etc/anotherconf
     section: drinks
     option: temperature
@@ -131,7 +131,7 @@ EXAMPLES = r'''
     backup: yes
 
 - name: Add "beverage=lemon juice" is in section "[drinks]" in specified file
-  community.general.ini_file:
+  community.general.stanza_file:
     path: /etc/conf
     section: drinks
     option: beverage
@@ -141,7 +141,7 @@ EXAMPLES = r'''
     exclusive: no
 
 - name: Ensure multiple values "beverage=coke" and "beverage=pepsi" are in section "[drinks]" in specified file
-  community.general.ini_file:
+  community.general.stanza_file:
     path: /etc/conf
     section: drinks
     option: beverage
@@ -182,7 +182,7 @@ def update_section_line(changed, section_lines, index, changed_lines, newline, m
     return (changed, msg)
 
 
-def do_ini(module, filename, section=None, option=None, values=None,
+def do_stanza(module, filename, section=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
            create=True, allow_no_value=False):
 
@@ -209,23 +209,23 @@ def do_ini(module, filename, section=None, option=None, values=None,
         destpath = os.path.dirname(filename)
         if not os.path.exists(destpath) and not module.check_mode:
             os.makedirs(destpath)
-        ini_lines = []
+        stanza_lines = []
     else:
-        with io.open(filename, 'r', encoding="utf-8-sig") as ini_file:
-            ini_lines = [to_text(line) for line in ini_file.readlines()]
+        with io.open(filename, 'r', encoding="utf-8-sig") as stanza_file:
+            stanza_lines = [to_text(line) for line in stanza_file.readlines()]
 
     if module._diff:
-        diff['before'] = u''.join(ini_lines)
+        diff['before'] = u''.join(stanza_lines)
 
     changed = False
 
-    # ini file could be empty
-    if not ini_lines:
-        ini_lines.append(u'\n')
+    # stanza file could be empty
+    if not stanza_lines:
+        stanza_lines.append(u'\n')
 
     # last line of file may not contain a trailing newline
-    if ini_lines[-1] == u"" or ini_lines[-1][-1] != u'\n':
-        ini_lines[-1] += u'\n'
+    if stanza_lines[-1] == u"" or stanza_lines[-1][-1] != u'\n':
+        stanza_lines[-1] += u'\n'
         changed = True
 
     # append fake section lines to simplify the logic
@@ -235,10 +235,10 @@ def do_ini(module, filename, section=None, option=None, values=None,
     fake_section_name = u"ad01e11446efb704fcdbdb21f2c43757423d91c5"
 
     # Insert it at the beginning
-    ini_lines.insert(0, u'[%s]' % fake_section_name)
+    stanza_lines.insert(0, u'[%s]' % fake_section_name)
 
     # At bottom:
-    ini_lines.append(u'[')
+    stanza_lines.append(u'[')
 
     # If no section is defined, fake section is used
     if not section:
@@ -259,7 +259,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
     before = after = []
     section_lines = []
 
-    for index, line in enumerate(ini_lines):
+    for index, line in enumerate(stanza_lines):
         # find start and end of section
         if line.startswith(u'[%s]' % section):
             within_section = True
@@ -269,9 +269,9 @@ def do_ini(module, filename, section=None, option=None, values=None,
                 section_end = index
                 break
 
-    before = ini_lines[0:section_start]
-    section_lines = ini_lines[section_start:section_end]
-    after = ini_lines[section_end:len(ini_lines)]
+    before = stanza_lines[0:section_start]
+    section_lines = stanza_lines[section_start:section_end]
+    after = stanza_lines[section_end:len(stanza_lines)]
 
     # Keep track of changed section_lines
     changed_lines = [0] * len(section_lines)
@@ -372,38 +372,38 @@ def do_ini(module, filename, section=None, option=None, values=None,
                 msg = 'section removed'
                 changed = True
 
-    # reassemble the ini_lines after manipulation
-    ini_lines = before + section_lines + after
+    # reassemble the stanza_lines after manipulation
+    stanza_lines = before + section_lines + after
 
     # remove the fake section line
-    del ini_lines[0]
-    del ini_lines[-1:]
+    del stanza_lines[0]
+    del stanza_lines[-1:]
 
     if not within_section and state == 'present':
-        ini_lines.append(u'[%s]\n' % section)
+        stanza_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
         if option and values:
             for value in values:
-                ini_lines.append(assignment_format % (option, value))
+                stanza_lines.append(assignment_format % (option, value))
         elif option and not values and allow_no_value:
-            ini_lines.append(u'%s\n' % option)
+            stanza_lines.append(u'%s\n' % option)
         else:
             msg = 'only section added'
         changed = True
 
     if module._diff:
-        diff['after'] = u''.join(ini_lines)
+        diff['after'] = u''.join(stanza_lines)
 
     backup_file = None
     if changed and not module.check_mode:
         if backup:
             backup_file = module.backup_local(filename)
 
-        encoded_ini_lines = [to_bytes(line) for line in ini_lines]
+        encoded_stanza_lines = [to_bytes(line) for line in stanza_lines]
         try:
             tmpfd, tmpfile = tempfile.mkstemp(dir=module.tmpdir)
             f = os.fdopen(tmpfd, 'wb')
-            f.writelines(encoded_ini_lines)
+            f.writelines(encoded_stanza_lines)
             f.close()
         except IOError:
             module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
@@ -460,7 +460,7 @@ def main():
     elif values is None:
         values = []
 
-    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value)
+    (changed, backup_file, diff, msg) = do_stanza(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
