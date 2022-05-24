@@ -37,7 +37,7 @@
       - result2.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
-- name: "test-values 3 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza '[drinks]' in specified file"
+- name: "test-values 3 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza 'drinks:' in specified file"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -53,16 +53,16 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 3 - set expected content and get current ini file content
+- name: test-values 3 - set expected content and get current stanza file content
   set_fact:
     expected3: |
 
-      [drinks]
-      fav = lemonade
-      fav = cocktail
+      drinks:
+        fav = lemonade
+        fav = cocktail
     content3: "{{ output_content.content | b64decode }}"
 
-- name: test-values 3 - Verify content of ini file is as expected and stanza_file 'changed' is true
+- name: test-values 3 - Verify content of stanza file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result3 is changed
@@ -70,7 +70,7 @@
       - content3 == expected3
 
 
-- name: "test-values 4 - remove attr 'fav=lemonade' from stanza '[drinks]' in specified file"
+- name: "test-values 4 - remove attr 'fav=lemonade' from stanza 'drinks:' in specified file"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -86,15 +86,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 4 - set expected content and get current ini file content
+- name: test-values 4 - set expected content and get current stanza file content
   set_fact:
     expected4: |
 
-      [drinks]
-      fav = cocktail
+      drinks:
+        fav = cocktail
     content4: "{{ output_content.content | b64decode }}"
 
-- name: test-values 4 - Verify content of ini file is as expected and stanza_file 'changed' is true
+- name: test-values 4 - Verify content of stanza file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result4 is changed
@@ -102,7 +102,7 @@
       - content4 == expected4
 
 
-- name: "test-values 5 - add attr 'fav=lemonade' in stanza '[drinks]' in specified file"
+- name: "test-values 5 - add attr 'fav=lemonade' in stanza 'drinks:' in specified file"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -118,16 +118,16 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 5 - set expected content and get current ini file content
+- name: test-values 5 - set expected content and get current stanza file content
   set_fact:
     expected5: |
 
-      [drinks]
-      fav = cocktail
-      fav = lemonade
+      drinks:
+        fav = cocktail
+        fav = lemonade
     content5: "{{ output_content.content | b64decode }}"
 
-- name: test-values 5 - Verify content of ini file is as expected and stanza_file 'changed' is true
+- name: test-values 5 - Verify content of stanza file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result5 is changed
@@ -135,7 +135,7 @@
       - content5 == expected5
 
 
-- name: "test-values 6 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza '[drinks]' and check for idempotency"
+- name: "test-values 6 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza 'drinks:' and check for idempotency"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -153,7 +153,7 @@
       - result6.msg == 'OK'
 
 
-- name: "test-values 7 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in stanza '[drinks]' and check for idempotency"
+- name: "test-values 7 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in stanza 'drinks:' and check for idempotency"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -171,7 +171,7 @@
       - result7.msg == 'OK'
 
 
-- name: "test-values 8 - add attr 'fav=lemonade' in stanza '[drinks]' again and ensure idempotency"
+- name: "test-values 8 - add attr 'fav=lemonade' in stanza 'drinks:' again and ensure idempotency"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -189,7 +189,7 @@
       - result8.msg == 'OK'
 
 
-- name: "test-values 9 - ensure only 'fav=lemonade' is 'present' in stanza '[drinks]' in specified file"
+- name: "test-values 9 - ensure only 'fav=lemonade' is 'present' in stanza 'drinks:' in specified file"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -204,15 +204,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 9 - set expected content and get current ini file content
+- name: test-values 9 - set expected content and get current stanza file content
   set_fact:
     expected9: |
 
-      [drinks]
-      fav = lemonade
+      drinks:
+        fav = lemonade
     content9: "{{ output_content.content | b64decode }}"
 
-- name: test-values 9 - Verify content of ini file is as expected and stanza_file 'changed' is true
+- name: test-values 9 - Verify content of stanza file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result9 is changed
@@ -220,7 +220,7 @@
       - content9 == expected9
 
 
-- name: "test-values 10 - remove non-existent 'fav=cocktail' from stanza '[drinks]' in specified file"
+- name: "test-values 10 - remove non-existent 'fav=cocktail' from stanza 'drinks:' in specified file"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -235,11 +235,11 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 10 - set expected content and get current ini file content
+- name: test-values 10 - set expected content and get current stanza file content
   set_fact:
     expected10: |
 
-      [drinks]
+      drinks:
     content10: "{{ output_content.content | b64decode }}"
 
 
@@ -251,9 +251,9 @@
       - content10 == expected10
 
 
-- name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in stanza '[drinks]'"
+- name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in stanza 'drinks:'"
   block:
-    - name: "test-values 11 - resetting ini_fie: Ensure 'fav=lemonade' is 'present' in stanza '[drinks]'"
+    - name: "test-values 11 - resetting stanza_file: Ensure 'fav=lemonade' is 'present' in stanza 'drinks:'"
       stanza_file:
         path: "{{ output_file }}"
         stanza: drinks
@@ -261,7 +261,7 @@
         values:
           - lemonade
         state: present
-    - name: "test-values 11 - Ensure 'beverage=coke' is 'present' in stanza '[drinks]'"
+    - name: "test-values 11 - Ensure 'beverage=coke' is 'present' in stanza 'drinks:'"
       stanza_file:
         path: "{{ output_file }}"
         stanza: drinks
@@ -276,13 +276,13 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 11 - set expected content and get current ini file content
+- name: test-values 11 - set expected content and get current stanza file content
   set_fact:
     expected11: |
 
-      [drinks]
-      fav = lemonade
-      beverage = coke
+      drinks:
+        fav = lemonade
+        beverage = coke
     content11: "{{ output_content.content | b64decode }}"
 
 - name: test-values 11 - assert 'changed' is true and content is OK
@@ -293,7 +293,7 @@
       - content11 == expected11
 
 
-- name: "test-values 12 - add attr 'fav=lemonade' in stanza '[drinks]' again and ensure idempotency"
+- name: "test-values 12 - add attr 'fav=lemonade' in stanza 'drinks:' again and ensure idempotency"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -311,7 +311,7 @@
       - result12.msg == 'OK'
 
 
-- name: "test-values 13 - add attr 'fav=cocktail' in stanza '[drinks]' in specified file"
+- name: "test-values 13 - add attr 'fav=cocktail' in stanza 'drinks:' in specified file"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -327,17 +327,17 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 13 - set expected content and get current ini file content
+- name: test-values 13 - set expected content and get current stanza file content
   set_fact:
     expected13: |
 
-      [drinks]
-      fav = lemonade
-      beverage = coke
-      fav = cocktail
+      drinks:
+        fav = lemonade
+        beverage = coke
+        fav = cocktail
     content13: "{{ output_content.content | b64decode }}"
 
-- name: test-values 13 - Verify content of ini file is as expected and stanza_file 'changed' is true
+- name: test-values 13 - Verify content of stanza file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result13 is changed
@@ -345,7 +345,7 @@
       - content13 == expected13
 
 
-- name: "test-values 14 - Ensure 'refreshment=[water, juice, soft drink]' is 'present' in stanza '[drinks]'"
+- name: "test-values 14 - Ensure 'refreshment=[water, juice, soft drink]' is 'present' in stanza 'drinks:'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -362,17 +362,17 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 14 - set expected content and get current ini file content
+- name: test-values 14 - set expected content and get current stanza file content
   set_fact:
     expected14: |
 
-      [drinks]
-      fav = lemonade
-      beverage = coke
-      fav = cocktail
-      refreshment = water
-      refreshment = juice
-      refreshment = soft drink
+      drinks:
+        fav = lemonade
+        beverage = coke
+        fav = cocktail
+        refreshment = water
+        refreshment = juice
+        refreshment = soft drink
     content14: "{{ output_content.content | b64decode }}"
 
 - name: test-values 14 - assert 'changed' is true and content is OK
@@ -383,7 +383,7 @@
       - content14 == expected14
 
 
-- name: "test-values 15 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza '[drinks]' and check for idempotency"
+- name: "test-values 15 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza 'drinks:' and check for idempotency"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -401,7 +401,7 @@
       - result15.msg == 'OK'
 
 
-- name: "test-values 16 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in stanza '[drinks]' and check for idempotency"
+- name: "test-values 16 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in stanza 'drinks:' and check for idempotency"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -419,7 +419,7 @@
       - result16.msg == 'OK'
 
 
-- name: "test-values 17 - Ensure attr 'refreshment' is 'absent' in stanza '[drinks]'"
+- name: "test-values 17 - Ensure attr 'refreshment' is 'absent' in stanza 'drinks:'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -432,14 +432,14 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 17 - set expected content and get current ini file content
+- name: test-values 17 - set expected content and get current stanza file content
   set_fact:
     expected17: |
 
-      [drinks]
-      fav = lemonade
-      beverage = coke
-      fav = cocktail
+      drinks:
+        fav = lemonade
+        beverage = coke
+        fav = cocktail
     content17: "{{ output_content.content | b64decode }}"
 
 - name: test-values 17 - assert 'changed' is true and content is as expected
@@ -450,7 +450,7 @@
       - content17 == expected17
 
 
-- name: "test-values 18 - Ensure 'beverage=coke' is 'abesent' in stanza '[drinks]'"
+- name: "test-values 18 - Ensure 'beverage=coke' is 'abesent' in stanza 'drinks:'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -463,13 +463,13 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 18 - set expected content and get current ini file content
+- name: test-values 18 - set expected content and get current stanza file content
   set_fact:
     expected18: |
 
-      [drinks]
-      fav = lemonade
-      fav = cocktail
+      drinks:
+        fav = lemonade
+        fav = cocktail
     content18: "{{ output_content.content | b64decode }}"
 
 - name: test-values 18 - assert 'changed' is true and content is as expected
@@ -480,7 +480,7 @@
       - content18 == expected18
 
 
-- name: "test-values 19 - Ensure non-existant 'beverage=coke' is 'abesent' in stanza '[drinks]'"
+- name: "test-values 19 - Ensure non-existant 'beverage=coke' is 'abesent' in stanza 'drinks:'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -516,7 +516,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 20 - get current ini file content
+- name: test-values 20 - get current stanza file content
   set_fact:
     content20: "{{ output_content.content | b64decode }}"
 
@@ -529,7 +529,7 @@
       - content20 == "\n"
 
 
-- name: "test-values 21 - Ensure 'refreshment=[water, juice, soft drink, juice]' (duplicates removed) is 'present' in stanza '[drinks]'"
+- name: "test-values 21 - Ensure 'refreshment=[water, juice, soft drink, juice]' (duplicates removed) is 'present' in stanza 'drinks:'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -547,11 +547,11 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 21 - set expected content and get current ini file content
+- name: test-values 21 - set expected content and get current stanza file content
   set_fact:
     expected21: |
 
-      [drinks]
+      drinks:
       refreshment = water
       refreshment = juice
       refreshment = soft drink
@@ -565,26 +565,26 @@
       - content21 == expected21
 
 
-- name: test-values 22 - Create starting ini file
+- name: test-values 22 - Create starting stanza file
   copy:
     content: |
       
       # Some comment to test
-      [mysqld]
-      connect_timeout = 300
-      max_connections = 1000
-      [stanza1]
-      var1 = aaa
-      # comment in stanza
-      var2 = foo
-      # var2 = bar
+      mysqld:
+        connect_timeout = 300
+        max_connections = 1000
+      stanza1:
+        var1 = aaa
+        # comment in stanza
+        var2 = foo
+        # var2 = bar
 
-      [stanza2]
-      var3 = ccc
-      # comment after stanza
+      stanza2:
+        var3 = ccc
+        # comment after stanza
     dest: "{{ output_file }}"
 
-- name: "test-values 22 - Ensure 'skip-name' with 'allow_no_value' is 'present' in stanza '[mysqld]' test allow_no_value"
+- name: "test-values 22 - Ensure 'skip-name' with 'allow_no_value' is 'present' in stanza 'mysqld:' test allow_no_value"
   stanza_file:
     path: "{{ output_file }}"
     stanza: mysqld
@@ -598,24 +598,24 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 22 - set expected content and get current ini file content
+- name: test-values 22 - set expected content and get current stanza file content
   set_fact:
     expected22: |
       
       # Some comment to test
-      [mysqld]
-      connect_timeout = 300
-      max_connections = 1000
-      skip-name
-      [stanza1]
-      var1 = aaa
-      # comment in stanza
-      var2 = foo
-      # var2 = bar
+      mysqld:
+        connect_timeout = 300
+        max_connections = 1000
+        skip-name
+      stanza1:
+        var1 = aaa
+        # comment in stanza
+        var2 = foo
+        # var2 = bar
 
-      [stanza2]
-      var3 = ccc
-      # comment after stanza
+      stanza2:
+        var3 = ccc
+        # comment after stanza
     content22: "{{ output_content.content | b64decode }}"
 
 - name: test-values 22 - assert 'changed' is true and content is OK and attr added
@@ -626,7 +626,7 @@
       - content22 == expected22
 
 
-- name: "test-values 23 - Ensure 'var2=[foo, foobar]' is 'present' in stanza '[stanza1]'"
+- name: "test-values 23 - Ensure 'var2=[foo, foobar]' is 'present' in stanza 'stanza1:'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: stanza1
@@ -642,26 +642,26 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 23 - set expected content and get current ini file content
+- name: test-values 23 - set expected content and get current stanza file content
   set_fact:
     content23: "{{ output_content.content | b64decode }}"
     expected23: |
       
       # Some comment to test
-      [mysqld]
-      connect_timeout = 300
-      max_connections = 1000
-      skip-name
-      [stanza1]
-      var1 = aaa
-      # comment in stanza
-      var2 = foo
-      var2 = foobar
-      # var2 = bar
+      mysqld:
+        connect_timeout = 300
+        max_connections = 1000
+        skip-name
+      stanza1:
+        var1 = aaa
+        # comment in stanza
+        var2 = foo
+        var2 = foobar
+        # var2 = bar
 
-      [stanza2]
-      var3 = ccc
-      # comment after stanza
+      stanza2:
+        var3 = ccc
+        # comment after stanza
 - name: test-values 23 - assert 'changed' and msg 'attr added' and content is as expected
   assert:
     that:
@@ -670,7 +670,7 @@
       - content23 == expected23
 
 
-- name: "test-values 24 - Ensure 'var2=[foo, foobar, bar]' is 'present' in stanza '[stanza1]' replacing commented attr 'var2=bar'"
+- name: "test-values 24 - Ensure 'var2=[foo, foobar, bar]' is 'present' in stanza 'stanza1:' replacing commented attr 'var2=bar'"
   stanza_file:
     path: "{{ output_file }}"
     stanza: stanza1
@@ -687,26 +687,26 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 24 - set expected content and get current ini file content
+- name: test-values 24 - set expected content and get current stanza file content
   set_fact:
     content24: "{{ output_content.content | b64decode }}"
     expected24: |
       
       # Some comment to test
-      [mysqld]
-      connect_timeout = 300
-      max_connections = 1000
-      skip-name
-      [stanza1]
-      var1 = aaa
-      # comment in stanza
-      var2 = foo
-      var2 = foobar
-      var2 = bar
+      mysqld:
+        connect_timeout = 300
+        max_connections = 1000
+        skip-name
+      stanza1:
+        var1 = aaa
+        # comment in stanza
+        var2 = foo
+        var2 = foobar
+        var2 = bar
 
-      [stanza2]
-      var3 = ccc
-      # comment after stanza
+      stanza2:
+        var3 = ccc
+        # comment after stanza
 - name: test-values 24 - assert 'added' and msg 'attr changed' and content is as expected
   assert:
     that:
@@ -737,7 +737,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 25 - set expected content and get current ini file content
+- name: test-values 25 - set expected content and get current stanza file content
   set_fact:
     expected25: |+
       beverage = coke
@@ -770,7 +770,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 26 - set expected content and get current ini file content
+- name: test-values 26 - set expected content and get current stanza file content
   set_fact:
     expected26: |+
       beverage = water
@@ -799,7 +799,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 27 - get current ini file content
+- name: test-values 27 - get current stanza file content
   set_fact:
     content27: "{{ output_content.content | b64decode }}"
 
@@ -838,31 +838,31 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-values 28 - set expected content and get current ini file content
+- name: test-values 28 - set expected content and get current stanza file content
   set_fact:
     expected28: |
       like = tea
       like = coffee
 
-      [drinks]
-      beverage = water
-      beverage = orange juice
+      drinks:
+        beverage = water
+        beverage = orange juice
     content28: "{{ output_content.content | b64decode }}"
 
-- name: test-values 28 - Verify content of ini file is as expected
+- name: test-values 28 - Verify content of stanza file is as expected
   assert:
     that:
       - content28 == expected28
 
 
-- name: test-value 29 - Create starting ini file
+- name: test-value 29 - Create starting stanza file
   copy:
     content: |
-      [drinks]
-      fav = cocktail
-      beverage = water
-      fav = lemonade
-      beverage = orange juice
+      drinks:
+        fav = cocktail
+        beverage = water
+        fav = lemonade
+        beverage = orange juice
     dest: "{{ output_file }}"
 
 - name: "test-value 29 - Test 'state=absent' with 'exclusive=true' with multiple attrs in stanza_file"
@@ -880,15 +880,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 29 - set expected content and get current ini file content
+- name: test-value 29 - set expected content and get current stanza file content
   set_fact:
     expected29: |
-      [drinks]
-      beverage = water
-      beverage = orange juice
+      drinks:
+        beverage = water
+        beverage = orange juice
     content29: "{{ output_content.content | b64decode }}"
 
-- name: test-value 29 - Verify content of ini file is as expected
+- name: test-value 29 - Verify content of stanza file is as expected
   assert:
     that:
       - result29 is changed
@@ -896,14 +896,14 @@
       - content29 == expected29
 
 
-- name: test-value 30 - Create starting ini file
+- name: test-value 30 - Create starting stanza file
   copy:
     content: |
-      [drinks]
-      fav = cocktail
-      beverage = water
-      fav = lemonade
-      beverage = orange juice
+      drinks:
+        fav = cocktail
+        beverage = water
+        fav = lemonade
+        beverage = orange juice
     dest: "{{ output_file }}"
 
 - name: "test-value 30 - Test 'state=absent' with 'exclusive=false' with multiple attrs in stanza_file"
@@ -922,16 +922,16 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 30 - set expected content and get current ini file content
+- name: test-value 30 - set expected content and get current stanza file content
   set_fact:
     expected30: |
-      [drinks]
-      beverage = water
-      fav = lemonade
-      beverage = orange juice
+      drinks:
+        beverage = water
+        fav = lemonade
+        beverage = orange juice
     content30: "{{ output_content.content | b64decode }}"
 
-- name: test-value 30 - Verify content of ini file is as expected
+- name: test-value 30 - Verify content of stanza file is as expected
   assert:
     that:
       - result30 is changed
@@ -939,14 +939,14 @@
       - content30 == expected30
 
 
-- name: test-value 31 - Create starting ini file
+- name: test-value 31 - Create starting stanza file
   copy:
     content: |
-      [drinks]
-      fav = cocktail
-      beverage = water
-      fav = lemonade
-      beverage = orange juice
+      drinks:
+        fav = cocktail
+        beverage = water
+        fav = lemonade
+        beverage = orange juice
     dest: "{{ output_file }}"
 
 - name: "test-value 31 - Test 'state=absent' with 'exclusive=true' and no value given with multiple attrs in stanza_file"
@@ -962,15 +962,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 31 - set expected content and get current ini file content
+- name: test-value 31 - set expected content and get current stanza file content
   set_fact:
     expected31: |
-      [drinks]
-      beverage = water
-      beverage = orange juice
+      drinks:
+        beverage = water
+        beverage = orange juice
     content31: "{{ output_content.content | b64decode }}"
 
-- name: test-value 31 - Verify content of ini file is as expected
+- name: test-value 31 - Verify content of stanza file is as expected
   assert:
     that:
       - result31 is changed
@@ -978,14 +978,14 @@
       - content31 == expected31
 
 
-- name: test-value 32 - Create starting ini file
+- name: test-value 32 - Create starting stanza file
   copy:
     content: |
-      [drinks]
-      fav = cocktail
-      beverage = water
-      fav = lemonade
-      beverage = orange juice
+      drinks:
+        fav = cocktail
+        beverage = water
+        fav = lemonade
+        beverage = orange juice
     dest: "{{ output_file }}"
 
 - name: "test-value 32 - Test 'state=absent' with 'exclusive=false' and no value given with multiple attrs in stanza_file"
@@ -1003,17 +1003,17 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 32 - set expected content and get current ini file content
+- name: test-value 32 - set expected content and get current stanza file content
   set_fact:
     expected32: |
-      [drinks]
-      fav = cocktail
-      beverage = water
-      fav = lemonade
-      beverage = orange juice
+      drinks:
+        fav = cocktail
+        beverage = water
+        fav = lemonade
+        beverage = orange juice
     content32: "{{ output_content.content | b64decode }}"
 
-- name: test-value 32 - Verify content of ini file is as expected
+- name: test-value 32 - Verify content of stanza file is as expected
   assert:
     that:
       - result32 is not changed

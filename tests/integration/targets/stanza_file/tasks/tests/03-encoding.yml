@@ -4,14 +4,14 @@
 - name: Create UTF-8 test file
   copy:
     content: !!binary |
-      W2FwcDptYWluXQphdmFpbGFibGVfbGFuZ3VhZ2VzID0gZW4gZnIgZXMgZGUgcHQgamEgbHQgemhf
-      VFcgaWQgZGEgcHRfQlIgcnUgc2wgaXQgbmxfTkwgdWsgdGEgc2kgY3MgbmIgaHUKIyBGdWxsIGxh
-      bmd1YWdlIG5hbWVzIGluIG5hdGl2ZSBsYW5ndWFnZSAoY29tbWEgc2VwYXJhdGVkKQphdmFpbGFi
-      bGVfbGFuZ3VhZ2VzX2Z1bGwgPSBFbmdsaXNoLCBGcmFuw6dhaXMsIEVzcGHDsW9sLCBEZXV0c2No
-      LCBQb3J0dWd1w6pzLCDml6XmnKzoqp4sIExpZXR1dm9zLCDkuK3mlocsIEluZG9uZXNpYSwgRGFu
-      c2ssIFBvcnR1Z3XDqnMgKEJyYXNpbCksINCg0YPRgdGB0LrQuNC5LCBTbG92ZW7FocSNaW5hLCBJ
-      dGFsaWFubywgTmVkZXJsYW5kcywg0KPQutGA0LDRl9C90YHRjNC60LAsIOCupOCuruCuv+CutOCv
-      jSwg4LeD4LeS4LaC4LeE4La9LCDEjGVza3ksIEJva23DpWwsIE1hZ3lhcgo=
+      YXBwX21haW46CmF2YWlsYWJsZV9sYW5ndWFnZXMgPSBlbiBmciBlcyBkZSBwdCBqYSBsdCB6aF9U
+      VyBpZCBkYSBwdF9CUiBydSBzbCBpdCBubF9OTCB1ayB0YSBzaSBjcyBuYiBodQojIEZ1bGwgbGFu
+      Z3VhZ2UgbmFtZXMgaW4gbmF0aXZlIGxhbmd1YWdlIChjb21tYSBzZXBhcmF0ZWQpCmF2YWlsYWJs
+      ZV9sYW5ndWFnZXNfZnVsbCA9IEVuZ2xpc2gsIEZyYW7Dp2FpcywgRXNwYcOxb2wsIERldXRzY2gs
+      IFBvcnR1Z3XDqnMsIOaXpeacrOiqniwgTGlldHV2b3MsIOS4reaWhywgSW5kb25lc2lhLCBEYW5z
+      aywgUG9ydHVndcOqcyAoQnJhc2lsKSwg0KDRg9GB0YHQutC40LksIFNsb3ZlbsWhxI1pbmEsIEl0
+      YWxpYW5vLCBOZWRlcmxhbmRzLCDQo9C60YDQsNGX0L3RgdGM0LrQsCwg4K6k4K6u4K6/4K604K+N
+      LCDgt4Pgt5LgtoLgt4Tgtr0sIMSMZXNreSwgQm9rbcOlbCwgTWFneWFyCg==
     dest: '{{ output_file }}'
 - name: Add entries
   stanza_file:
@@ -21,7 +21,7 @@
     path: '{{ output_file }}'
     create: true
   loop:
-    - stanza: app:main
+    - stanza: app_main
       attr: sqlalchemy.url
       value: postgresql://app:secret@database/app
     - stanza: handler_filelog

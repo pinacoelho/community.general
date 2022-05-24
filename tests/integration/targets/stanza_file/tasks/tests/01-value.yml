@@ -37,7 +37,7 @@
       - result_value_2.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
-- name: test-value 3 - add "fav=lemonade" in stanza "[drinks]" in specified file
+- name: test-value 3 - add "fav=lemonade" in stanza "drinks:" in specified file
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -50,15 +50,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 3 - set expected content and get current ini file content
+- name: test-value 3 - set expected content and get current stanza file content
   set_fact:
     expected3: |
 
-      [drinks]
-      fav = lemonade
+      drinks:
+        fav = lemonade
     content3: "{{ output_content.content | b64decode }}"
 
-- name: test-value 3 - Verify content of ini file is as expected and stanza_file 'changed' is true
+- name: test-value 3 - Verify content of stanza file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result3 is changed
@@ -66,7 +66,7 @@
       - content3 == expected3
 
 
-- name: test-value 4 - add "fav=lemonade" is in stanza "[drinks]" again
+- name: test-value 4 - add "fav=lemonade" is in stanza "drinks:" again
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -81,7 +81,7 @@
       - result4.msg == 'OK'
 
 
-- name: test-value 5 - Ensure "beverage=coke" is in stanza "[drinks]"
+- name: test-value 5 - Ensure "beverage=coke" is in stanza "drinks:"
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -94,13 +94,13 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 5 - set expected content and get current ini file content
+- name: test-value 5 - set expected content and get current stanza file content
   set_fact:
     expected5: |
 
-      [drinks]
-      fav = lemonade
-      beverage = coke
+      drinks:
+        fav = lemonade
+        beverage = coke
     content5: "{{ output_content.content | b64decode }}"
 
 - name: test-value 5 - assert 'changed' is true and content is OK
@@ -124,12 +124,12 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 6 - set expected content and get current ini file content
+- name: test-value 6 - set expected content and get current stanza file content
   set_fact:
     expected6: |
 
-      [drinks]
-      fav = lemonade
+      drinks:
+        fav = lemonade
     content6: "{{ output_content.content | b64decode }}"
 
 - name: test-value 6 - assert 'changed' is true and content is as expected
@@ -140,7 +140,7 @@
       - content6 == expected6
 
 
-- name: test-value 7 - remove stanza 'drinks'
+- name: test-value 7 - remove stanza "drinks:""
   stanza_file:
     path: "{{ output_file }}"
     stanza: drinks
@@ -152,7 +152,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 7 - get current ini file content
+- name: test-value 7 - get current stanza file content
   set_fact:
     content7: "{{ output_content.content | b64decode }}"
 
@@ -179,13 +179,13 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 8 - set expected content and get current ini file content
+- name: test-value 8 - set expected content and get current stanza file content
   set_fact:
     content8: "{{ output_content.content | b64decode }}"
     expected8: |
 
-      [mysqld]
-      skip-name
+      mysqld:
+        skip-name
 
 - name: test-value 8 - assert 'changed' is true and stanza and attr added
   assert:
@@ -261,17 +261,17 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 12 - set expected content and get current ini file content
+- name: test-value 12 - set expected content and get current stanza file content
   set_fact:
     content12: "{{ output_content.content | b64decode }}"
     expected12: |
 
-      [mysqld]
-      skip-name
-      skip-name-resolve
-      max_connections = 500
+      mysqld:
+        skip-name
+        skip-name-resolve
+        max_connections = 500
   
-- name: test-value 12 - Verify content of ini file is as expected
+- name: test-value 12 - Verify content of stanza file is as expected
   assert:
     that:
       - content12 == expected12
@@ -290,15 +290,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 13 - set expected content and get current ini file content
+- name: test-value 13 - set expected content and get current stanza file content
   set_fact:
     content13: "{{ output_content.content | b64decode }}"
     expected13: |
 
-      [mysqld]
-      skip-name = myvalue
-      skip-name-resolve
-      max_connections = 500
+      mysqld:
+        skip-name = myvalue
+        skip-name-resolve
+        max_connections = 500
 
 - name: test-value 13 - assert 'changed' and msg 'attr changed' and content is as expected
   assert:
@@ -321,15 +321,15 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 14 - set expected content and get current ini file content
+- name: test-value 14 - set expected content and get current stanza file content
   set_fact:
     content14: "{{ output_content.content | b64decode }}"
     expected14: |
 
-      [mysqld]
-      skip-name
-      skip-name-resolve
-      max_connections = 500
+      mysqld:
+        skip-name
+        skip-name-resolve
+        max_connections = 500
 
 - name: test-value 14 - assert 'changed' is true and msg 'attr changed' and content is as expected
   assert:
@@ -352,14 +352,14 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 15 - set expected content and get current ini file content
+- name: test-value 15 - set expected content and get current stanza file content
   set_fact:
     content15: "{{ output_content.content | b64decode }}"
     expected15: |
 
-      [mysqld]
-      skip-name
-      max_connections = 500
+      mysqld:
+        skip-name
+        max_connections = 500
 
 - name: test-value 15 - assert 'changed' is true and msg 'attr changed' and content is as expected
   assert:
@@ -388,7 +388,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 16 - set expected content and get current ini file content
+- name: test-value 16 - set expected content and get current stanza file content
   set_fact:
     expected16: |+
       beverage = coke
@@ -416,7 +416,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 17 - set expected content and get current ini file content
+- name: test-value 17 - set expected content and get current stanza file content
   set_fact:
     expected17: |+
       beverage = water
@@ -444,7 +444,7 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 18 - get current ini file content
+- name: test-value 18 - get current stanza file content
   set_fact:
     content18: "{{ output_content.content | b64decode }}"
 
@@ -476,16 +476,16 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 19 - set expected content and get current ini file content
+- name: test-value 19 - set expected content and get current stanza file content
   set_fact:
     expected19: |
       like = tea
 
-      [drinks]
-      beverage = water
+      drinks:
+        beverage = water
     content19: "{{ output_content.content | b64decode }}"
 
-- name: test-value 19 - Verify content of ini file is as expected
+- name: test-value 19 - Verify content of stanza file is as expected
   assert:
     that:
       - content19 == expected19
@@ -527,37 +527,37 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 20 - set expected content and get current ini file content
+- name: test-value 20 - set expected content and get current stanza file content
   set_fact:
     expected20: |+
       
-      [extensions]
-      evolve = 
-      regress = 
-      improve = 
-      [foobar]
-      foo = 
+      extensions:
+        evolve = 
+        regress = 
+        improve = 
+      foobar:
+        foo = 
     content20: "{{ output_content.content | b64decode }}"
 
-- name: test-value 20 - Verify content of ini file is as expected
+- name: test-value 20 - Verify content of stanza file is as expected
   assert:
     that:
       - content20 == expected20
 
 
-- name: test-value 21 - Create starting ini file
+- name: test-value 21 - Create starting stanza file
   copy:
     # The content below is the following text file with BOM:
-    # [stanza1]
-    # var1=aaa
-    # var2=bbb
-    # [stanza2]
-    # var3=ccc
+    # stanza1:
+    #   var1=aaa
+    #   var2=bbb
+    # stanza2:
+    #   var3=ccc
     content: !!binary |
-      77u/W3NlY3Rpb24xXQp2YXIxPWFhYQp2YXIyPWJiYgpbc2VjdGlvbjJdCnZhcjM9Y2NjCg==
+      77u/c2VjdGlvbjE6CiAgdmFyMT1hYWEKICB2YXIyPWJiYgpzZWN0aW9uMjoKICB2YXIzPWNjYwo=
     dest: "{{ output_file }}"
 
-- name: test-value 21 -  Test ini breakage
+- name: test-value 21 -  Test stanza breakage
   stanza_file:
     path: "{{ output_file }}"
     stanza: stanza1
@@ -570,18 +570,18 @@
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-value 21 - set expected content and get current ini file content
+- name: test-value 21 - set expected content and get current stanza file content
   set_fact:
     expected21: |
-      [stanza1]
-      var1=aaa
-      var2=bbb
-      var4 = 0
-      [stanza2]
-      var3=ccc
+      stanza1:
+        var1=aaa
+        var2=bbb
+        var4 = 0
+      stanza2:
+        var3=ccc
     content21: "{{ output_content.content | b64decode }}"
 
-- name: test-value 21 - Verify content of ini file is as expected
+- name: test-value 21 - Verify content of stanza file is as expected
   assert:
     that:
       - result21 is changed
