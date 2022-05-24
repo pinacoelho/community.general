@@ -2,10 +2,10 @@
 ## basiscs
 
 - name: test-basic 1 - specify both "value" and "values" and fail
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     value: lemonade
     values:
       - coke
@@ -22,9 +22,9 @@
 
 
 - name: test-basic 2 - set "create=no" on non-existing file and fail
-  ini_file:
+  stanza_file:
     path: "{{ non_existing_file }}"
-    section: food
+    stanza: food
     create: false
     value: banana
   register: result_basic_2

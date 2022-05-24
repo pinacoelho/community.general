@@ -3,10 +3,10 @@
 ## testing value
 
 - name: test-value 1 - set "state=present" and "value=null" and "allow_no_value=false" and fail
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: cars
-    option: audi
+    stanza: cars
+    attr: audi
     value: null
     allow_no_value: false
   register: result_value_1
@@ -21,10 +21,10 @@
 
 
 - name: test-value 2 - set "state=present" and omit "value" and "allow_no_value=false" and fail
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: cars
-    option: audi
+    stanza: cars
+    attr: audi
     allow_no_value: false
   register: result_value_2
   ignore_errors: true
@@ -37,11 +37,11 @@
       - result_value_2.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
-- name: test-value 3 - add "fav=lemonade" in section "[drinks]" in specified file
-  ini_file:
+- name: test-value 3 - add "fav=lemonade" in stanza "[drinks]" in specified file
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     value: lemonade
   register: result3
 
@@ -58,19 +58,19 @@
       fav = lemonade
     content3: "{{ output_content.content | b64decode }}"
 
-- name: test-value 3 - Verify content of ini file is as expected and ini_file 'changed' is true
+- name: test-value 3 - Verify content of ini file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result3 is changed
-      - result3.msg == 'section and option added'
+      - result3.msg == 'stanza and attr added'
       - content3 == expected3
 
 
-- name: test-value 4 - add "fav=lemonade" is in section "[drinks]" again
-  ini_file:
+- name: test-value 4 - add "fav=lemonade" is in stanza "[drinks]" again
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     value: lemonade
   register: result4
 
@@ -81,11 +81,11 @@
       - result4.msg == 'OK'
 
 
-- name: test-value 5 - Ensure "beverage=coke" is in section "[drinks]"
-  ini_file:
+- name: test-value 5 - Ensure "beverage=coke" is in stanza "[drinks]"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: beverage
+    stanza: drinks
+    attr: beverage
     value: coke
   register: result5
 
@@ -107,15 +107,15 @@
   assert:
     that:
       - result5 is changed
-      - result5.msg == 'option added'
+      - result5.msg == 'attr added'
       - content5 == expected5
 
 
-- name: test-value 6 - Remove option "beverage=coke"
-  ini_file:
+- name: test-value 6 - Remove attr "beverage=coke"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: beverage
+    stanza: drinks
+    attr: beverage
     state: absent
   register: result6
 
@@ -136,14 +136,14 @@
   assert:
     that:
       - result6 is changed
-      - result6.msg == 'option changed'
+      - result6.msg == 'attr changed'
       - content6 == expected6
 
 
-- name: test-value 7 - remove section 'drinks'
-  ini_file:
+- name: test-value 7 - remove stanza 'drinks'
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
+    stanza: drinks
     state: absent
   register: result7
 
@@ -160,17 +160,17 @@
   assert:
     that:
       - result7 is changed
-      - result7.msg == 'section removed'
+      - result7.msg == 'stanza removed'
       - content7 == "\n"
 
 
 # allow_no_value
 
 - name: test-value 8 - test allow_no_value
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: skip-name
+    stanza: mysqld
+    attr: skip-name
     allow_no_value: yes
   register: result8
 
@@ -187,19 +187,19 @@
       [mysqld]
       skip-name
 
-- name: test-value 8 - assert 'changed' is true and section and option added
+- name: test-value 8 - assert 'changed' is true and stanza and attr added
   assert:
     that:
       - result8 is changed
-      - result8.msg == 'section and option added'
+      - result8.msg == 'stanza and attr added'
       - content8 == expected8
 
 
 - name: test-value 9 - test allow_no_value idempotency
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: skip-name
+    stanza: mysqld
+    attr: skip-name
     allow_no_value: yes
   register: result9
 
@@ -210,24 +210,24 @@
       - result9.msg == 'OK'
 
 
-- name: test-value 10 - test create empty section
-  ini_file:
+- name: test-value 10 - test create empty stanza
+  stanza_file:
     path: "{{ output_file }}"
-    section: new_empty_section
+    stanza: new_empty_stanza
     allow_no_value: yes
   register: result10
 
-- name: test-value 10 - assert 'changed' is true and section added
+- name: test-value 10 - assert 'changed' is true and stanza added
   assert:
     that:
       - result10 is changed
-      - result10.msg == 'only section added'
+      - result10.msg == 'only stanza added'
 
 
-- name: test-value 11 - test create empty section idempotency
-  ini_file:
+- name: test-value 11 - test create empty stanza idempotency
+  stanza_file:
     path: "{{ output_file }}"
-    section: new_empty_section
+    stanza: new_empty_stanza
     allow_no_value: yes
   register: result11
 
@@ -238,18 +238,18 @@
       - result11.msg == 'OK'
 
 
-- name: test-value 12 - test remove empty section
-  ini_file:
+- name: test-value 12 - test remove empty stanza
+  stanza_file:
     state: absent
     path: "{{ output_file }}"
-    section: new_empty_section
+    stanza: new_empty_stanza
     allow_no_value: yes
 
 - name: test-value 12 - test allow_no_value with loop
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: "{{ item.o }}"
+    stanza: mysqld
+    attr: "{{ item.o }}"
     value: "{{ item.v | d(omit) }}"
     allow_no_value: yes
   loop:
@@ -277,11 +277,11 @@
       - content12 == expected12
 
 
-- name: test-value 13 - change option with no value to option with value
-  ini_file:
+- name: test-value 13 - change attr with no value to attr with value
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: skip-name
+    stanza: mysqld
+    attr: skip-name
     value: myvalue
   register: result13
 
@@ -300,19 +300,19 @@
       skip-name-resolve
       max_connections = 500
 
-- name: test-value 13 - assert 'changed' and msg 'option changed' and content is as expected
+- name: test-value 13 - assert 'changed' and msg 'attr changed' and content is as expected
   assert:
     that:
       - result13 is changed
-      - result13.msg == 'option changed'
+      - result13.msg == 'attr changed'
       - content13 == expected13
 
 
-- name: test-value 14 - change option with value to option with no value
-  ini_file:
+- name: test-value 14 - change attr with value to attr with no value
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: skip-name
+    stanza: mysqld
+    attr: skip-name
     allow_no_value: yes
   register: result14
 
@@ -331,19 +331,19 @@
       skip-name-resolve
       max_connections = 500
 
-- name: test-value 14 - assert 'changed' is true and msg 'option changed' and content is as expected
+- name: test-value 14 - assert 'changed' is true and msg 'attr changed' and content is as expected
   assert:
     that:
       - result14 is changed
-      - result14.msg == 'option changed'
+      - result14.msg == 'attr changed'
       - content14 == expected14
 
 
-- name: test-value 15 - Remove option with no value
-  ini_file:
+- name: test-value 15 - Remove attr with no value
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: skip-name-resolve
+    stanza: mysqld
+    attr: skip-name-resolve
     state: absent
   register: result15
 
@@ -361,11 +361,11 @@
       skip-name
       max_connections = 500
 
-- name: test-value 15 - assert 'changed' is true and msg 'option changed' and content is as expected
+- name: test-value 15 - assert 'changed' is true and msg 'attr changed' and content is as expected
   assert:
     that:
       - result15 is changed
-      - result15.msg == 'option changed'
+      - result15.msg == 'attr changed'
       - content15 == expected15
 
 
@@ -375,11 +375,11 @@
     dest: "{{ output_file }}"
     force: yes
 
-- name: test-value 16 - Ensure "beverage=coke" is created within no section
-  ini_file:
-    section:
+- name: test-value 16 - Ensure "beverage=coke" is created within no stanza
+  stanza_file:
+    stanza:
     path: "{{ output_file }}"
-    option: beverage
+    attr: beverage
     value: coke
   register: result16
 
@@ -395,20 +395,20 @@
       
     content16: "{{ output_content.content | b64decode }}"
 
-- name: test-value 16 - assert 'changed' is true and content is OK (no section)
+- name: test-value 16 - assert 'changed' is true and content is OK (no stanza)
   assert:
     that:
       - result16 is changed
-      - result16.msg == 'option added'
+      - result16.msg == 'attr added'
       - content16 == expected16
 
 
-- name: test-value 17 - Ensure "beverage=coke" is modified as "beverage=water" within no section
-  ini_file:
+- name: test-value 17 - Ensure "beverage=coke" is modified as "beverage=water" within no stanza
+  stanza_file:
     path: "{{ output_file }}"
-    option: beverage
+    attr: beverage
     value: water
-    section:
+    stanza:
   register: result17
 
 - name: test-value 17 - read content from output file
@@ -423,19 +423,19 @@
       
     content17: "{{ output_content.content | b64decode }}"
 
-- name: test-value 17 - assert 'changed' is true and content is OK (no section)
+- name: test-value 17 - assert 'changed' is true and content is OK (no stanza)
   assert:
     that:
       - result17 is changed
-      - result17.msg == 'option changed'
+      - result17.msg == 'attr changed'
       - content17 == expected17
 
 
-- name: test-value 18 - remove option 'beverage' within no section
-  ini_file:
-    section:
+- name: test-value 18 - remove attr 'beverage' within no stanza
+  stanza_file:
+    stanza:
     path: "{{ output_file }}"
-    option: beverage
+    attr: beverage
     state: absent
   register: result18
 
@@ -448,27 +448,27 @@
   set_fact:
     content18: "{{ output_content.content | b64decode }}"
 
-- name: test-value 18 - assert 'changed' is true and option is removed (no section)
+- name: test-value 18 - assert 'changed' is true and attr is removed (no stanza)
   assert:
     that:
       - result18 is changed
-      - result18.msg == 'option changed'
+      - result18.msg == 'attr changed'
       - content18 == "\n"
 
 
-- name: test-value 19 - Check add option without section before existing section
+- name: test-value 19 - Check add attr without stanza before existing stanza
   block:
-    - name: test-value 19 - Add option with section
-      ini_file:
+    - name: test-value 19 - Add attr with stanza
+      stanza_file:
         path: "{{ output_file }}"
-        section: drinks
-        option: beverage
+        stanza: drinks
+        attr: beverage
         value: water
-    - name: test-value 19 - Add option without section
-      ini_file:
+    - name: test-value 19 - Add attr without stanza
+      stanza_file:
         path: "{{ output_file }}"
-        section:
-        option: like
+        stanza:
+        attr: like
         value: tea
 
 - name: test-value 19 - read content from output file
@@ -491,35 +491,35 @@
       - content19 == expected19
 
 
-- name: test-value 20 - Check add option with empty string value
+- name: test-value 20 - Check add attr with empty string value
   block:
     - name: test-value 20 - Remove drinks
-      ini_file:
+      stanza_file:
         path: "{{ output_file }}"
-        section: drinks
+        stanza: drinks
         state: absent
     - name: test-value 20 - Remove tea
-      ini_file:
+      stanza_file:
         path: "{{ output_file }}"
-        section:
-        option: like
+        stanza:
+        attr: like
         value: tea
         state: absent
     # See https://github.com/ansible-collections/community.general/issues/3031
     - name: test-value 20 - Tests with empty strings
-      ini_file:
+      stanza_file:
         path: "{{ output_file }}"
-        section: "{{ item.section | d('extensions') }}"
-        option: "{{ item.option }}"
+        stanza: "{{ item.stanza | d('extensions') }}"
+        attr: "{{ item.attr }}"
         value: ""
         allow_no_value: "{{ item.no_value | d(omit) }}"
       loop:
-        - option: evolve
-        - option: regress
-        - section: foobar
-          option: foo
+        - attr: evolve
+        - attr: regress
+        - stanza: foobar
+          attr: foo
           no_value: true
-        - option: improve
+        - attr: improve
           no_value: true
 
 - name: test-value 20 - read content from output file
@@ -548,20 +548,20 @@
 - name: test-value 21 - Create starting ini file
   copy:
     # The content below is the following text file with BOM:
-    # [section1]
+    # [stanza1]
     # var1=aaa
     # var2=bbb
-    # [section2]
+    # [stanza2]
     # var3=ccc
     content: !!binary |
       77u/W3NlY3Rpb24xXQp2YXIxPWFhYQp2YXIyPWJiYgpbc2VjdGlvbjJdCnZhcjM9Y2NjCg==
     dest: "{{ output_file }}"
 
 - name: test-value 21 -  Test ini breakage
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: section1
-    option: var4
+    stanza: stanza1
+    attr: var4
     value: 0
   register: result21
 
@@ -573,11 +573,11 @@
 - name: test-value 21 - set expected content and get current ini file content
   set_fact:
     expected21: |
-      [section1]
+      [stanza1]
       var1=aaa
       var2=bbb
       var4 = 0
-      [section2]
+      [stanza2]
       var3=ccc
     content21: "{{ output_content.content | b64decode }}"
 
@@ -585,5 +585,5 @@
   assert:
     that:
       - result21 is changed
-      - result21.msg == 'option added'
+      - result21.msg == 'attr added'
       - content21 == expected21

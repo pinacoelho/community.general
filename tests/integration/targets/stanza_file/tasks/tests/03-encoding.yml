@@ -14,28 +14,28 @@
       jSwg4LeD4LeS4LaC4LeE4La9LCDEjGVza3ksIEJva23DpWwsIE1hZ3lhcgo=
     dest: '{{ output_file }}'
 - name: Add entries
-  ini_file:
-    section: "{{ item.section }}"
-    option: "{{ item.option }}"
+  stanza_file:
+    stanza: "{{ item.stanza }}"
+    attr: "{{ item.attr }}"
     value: "{{ item.value }}"
     path: '{{ output_file }}'
     create: true
   loop:
-    - section: app:main
-      option: sqlalchemy.url
+    - stanza: app:main
+      attr: sqlalchemy.url
       value: postgresql://app:secret@database/app
-    - section: handler_filelog
-      option: args
+    - stanza: handler_filelog
+      attr: args
       value: (sys.stderr,)
-    - section: handler_filelog
-      option: class
+    - stanza: handler_filelog
+      attr: class
       value: StreamHandler
-    - section: handler_exc_handler
-      option: args
+    - stanza: handler_exc_handler
+      attr: args
       value: (sys.stderr,)
-    - section: båz
-      option: ﬀöø
+    - stanza: båz
+      attr: ﬀöø
       value: ḃâŗ
-    - section: båz
-      option: ﬀöø
+    - stanza: båz
+      attr: ﬀöø
       value: bar

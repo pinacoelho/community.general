@@ -4,7 +4,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-# test code for ini_file plugins
+# test code for stanza_file plugins
 # (c) 2017 Red Hat Inc.
 
 # This file is part of Ansible
@@ -24,8 +24,8 @@
 
 - name: record the output directory
   set_fact:
-    output_file: "{{ remote_tmp_dir }}/foo.ini"
-    non_existing_file: "{{ remote_tmp_dir }}/bar.ini"
+    output_file: "{{ remote_tmp_dir }}/foo.stanza"
+    non_existing_file: "{{ remote_tmp_dir }}/bar.stanza"
 
 - name: include tasks
   block:

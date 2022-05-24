@@ -3,10 +3,10 @@
 ## testing values
 
 - name: "test-values 1 - set 'state=present' and 'values=[]' and 'allow_no_value=false' and fail"
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: cars
-    option: audi
+    stanza: cars
+    attr: audi
     values: []
     allow_no_value: false
   register: result1
@@ -21,10 +21,10 @@
 
 
 - name: "test-values 2 - set 'state=present' and omit 'values' and 'allow_no_value=false' and fail"
-  ini_file:
+  stanza_file:
     path: "{{ output_file }}"
-    section: cars
-    option: audi
+    stanza: cars
+    attr: audi
     allow_no_value: false
   register: result2
   ignore_errors: true
@@ -37,11 +37,11 @@
       - result2.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
-- name: "test-values 3 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in section '[drinks]' in specified file"
-  ini_file:
+- name: "test-values 3 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza '[drinks]' in specified file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
       - cocktail
@@ -62,19 +62,19 @@
       fav = cocktail
     content3: "{{ output_content.content | b64decode }}"
 
-- name: test-values 3 - Verify content of ini file is as expected and ini_file 'changed' is true
+- name: test-values 3 - Verify content of ini file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result3 is changed
-      - result3.msg == 'section and option added'
+      - result3.msg == 'stanza and attr added'
       - content3 == expected3
 
 
-- name: "test-values 4 - remove option 'fav=lemonade' from section '[drinks]' in specified file"
-  ini_file:
+- name: "test-values 4 - remove attr 'fav=lemonade' from stanza '[drinks]' in specified file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
     state: absent
@@ -94,19 +94,19 @@
       fav = cocktail
     content4: "{{ output_content.content | b64decode }}"
 
-- name: test-values 4 - Verify content of ini file is as expected and ini_file 'changed' is true
+- name: test-values 4 - Verify content of ini file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result4 is changed
-      - result4.msg == 'option changed'
+      - result4.msg == 'attr changed'
       - content4 == expected4
 
 
-- name: "test-values 5 - add option 'fav=lemonade' in section '[drinks]' in specified file"
-  ini_file:
+- name: "test-values 5 - add attr 'fav=lemonade' in stanza '[drinks]' in specified file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
     state: present
@@ -127,19 +127,19 @@
       fav = lemonade
     content5: "{{ output_content.content | b64decode }}"
 
-- name: test-values 5 - Verify content of ini file is as expected and ini_file 'changed' is true
+- name: test-values 5 - Verify content of ini file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result5 is changed
-      - result5.msg == 'option added'
+      - result5.msg == 'attr added'
       - content5 == expected5
 
 
-- name: "test-values 6 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+- name: "test-values 6 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza '[drinks]' and check for idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
       - cocktail
@@ -153,11 +153,11 @@
       - result6.msg == 'OK'
 
 
-- name: "test-values 7 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+- name: "test-values 7 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in stanza '[drinks]' and check for idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - cocktail
       - lemonade
@@ -171,11 +171,11 @@
       - result7.msg == 'OK'
 
 
-- name: "test-values 8 - add option 'fav=lemonade' in section '[drinks]' again and ensure idempotency"
-  ini_file:
+- name: "test-values 8 - add attr 'fav=lemonade' in stanza '[drinks]' again and ensure idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
     state: present
@@ -189,11 +189,11 @@
       - result8.msg == 'OK'
 
 
-- name: "test-values 9 - ensure only 'fav=lemonade' is 'present' in section '[drinks]' in specified file"
-  ini_file:
+- name: "test-values 9 - ensure only 'fav=lemonade' is 'present' in stanza '[drinks]' in specified file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
     state: present
@@ -212,19 +212,19 @@
       fav = lemonade
     content9: "{{ output_content.content | b64decode }}"
 
-- name: test-values 9 - Verify content of ini file is as expected and ini_file 'changed' is true
+- name: test-values 9 - Verify content of ini file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result9 is changed
-      - result9.msg == 'option changed'
+      - result9.msg == 'attr changed'
       - content9 == expected9
 
 
-- name: "test-values 10 - remove non-existent 'fav=cocktail' from section '[drinks]' in specified file"
-  ini_file:
+- name: "test-values 10 - remove non-existent 'fav=cocktail' from stanza '[drinks]' in specified file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - cocktail
     state: absent
@@ -247,25 +247,25 @@
   assert:
     that:
       - result10 is changed
-      - result10.msg == 'option changed'
+      - result10.msg == 'attr changed'
       - content10 == expected10
 
 
-- name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in section '[drinks]'"
+- name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in stanza '[drinks]'"
   block:
-    - name: "test-values 11 - resetting ini_fie: Ensure 'fav=lemonade' is 'present' in section '[drinks]'"
-      ini_file:
+    - name: "test-values 11 - resetting ini_fie: Ensure 'fav=lemonade' is 'present' in stanza '[drinks]'"
+      stanza_file:
         path: "{{ output_file }}"
-        section: drinks
-        option: fav
+        stanza: drinks
+        attr: fav
         values:
           - lemonade
         state: present
-    - name: "test-values 11 - Ensure 'beverage=coke' is 'present' in section '[drinks]'"
-      ini_file:
+    - name: "test-values 11 - Ensure 'beverage=coke' is 'present' in stanza '[drinks]'"
+      stanza_file:
         path: "{{ output_file }}"
-        section: drinks
-        option: beverage
+        stanza: drinks
+        attr: beverage
         values:
           - coke
         state: present
@@ -289,15 +289,15 @@
   assert:
     that:
       - result11 is changed
-      - result11.msg == 'option added'
+      - result11.msg == 'attr added'
       - content11 == expected11
 
 
-- name: "test-values 12 - add option 'fav=lemonade' in section '[drinks]' again and ensure idempotency"
-  ini_file:
+- name: "test-values 12 - add attr 'fav=lemonade' in stanza '[drinks]' again and ensure idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
     state: present
@@ -311,11 +311,11 @@
       - result12.msg == 'OK'
 
 
-- name: "test-values 13 - add option 'fav=cocktail' in section '[drinks]' in specified file"
-  ini_file:
+- name: "test-values 13 - add attr 'fav=cocktail' in stanza '[drinks]' in specified file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - cocktail
     state: present
@@ -337,19 +337,19 @@
       fav = cocktail
     content13: "{{ output_content.content | b64decode }}"
 
-- name: test-values 13 - Verify content of ini file is as expected and ini_file 'changed' is true
+- name: test-values 13 - Verify content of ini file is as expected and stanza_file 'changed' is true
   assert:
     that:
       - result13 is changed
-      - result13.msg == 'option added'
+      - result13.msg == 'attr added'
       - content13 == expected13
 
 
-- name: "test-values 14 - Ensure 'refreshment=[water, juice, soft drink]' is 'present' in section '[drinks]'"
-  ini_file:
+- name: "test-values 14 - Ensure 'refreshment=[water, juice, soft drink]' is 'present' in stanza '[drinks]'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: refreshment
+    stanza: drinks
+    attr: refreshment
     values:
       - water
       - juice
@@ -379,15 +379,15 @@
   assert:
     that:
       - result14 is changed
-      - result14.msg == 'option added'
+      - result14.msg == 'attr added'
       - content14 == expected14
 
 
-- name: "test-values 15 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+- name: "test-values 15 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in stanza '[drinks]' and check for idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - lemonade
       - cocktail
@@ -401,11 +401,11 @@
       - result15.msg == 'OK'
 
 
-- name: "test-values 16 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+- name: "test-values 16 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in stanza '[drinks]' and check for idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - cocktail
       - lemonade
@@ -419,11 +419,11 @@
       - result16.msg == 'OK'
 
 
-- name: "test-values 17 - Ensure option 'refreshment' is 'absent' in section '[drinks]'"
-  ini_file:
+- name: "test-values 17 - Ensure attr 'refreshment' is 'absent' in stanza '[drinks]'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: refreshment
+    stanza: drinks
+    attr: refreshment
     state: absent
   register: result17
 
@@ -446,15 +446,15 @@
   assert:
     that:
       - result17 is changed
-      - result17.msg == 'option changed'
+      - result17.msg == 'attr changed'
       - content17 == expected17
 
 
-- name: "test-values 18 - Ensure 'beverage=coke' is 'abesent' in section '[drinks]'"
-  ini_file:
+- name: "test-values 18 - Ensure 'beverage=coke' is 'abesent' in stanza '[drinks]'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: beverage
+    stanza: drinks
+    attr: beverage
     state: absent
   register: result18
 
@@ -476,15 +476,15 @@
   assert:
     that:
       - result18 is changed
-      - result18.msg == 'option changed'
+      - result18.msg == 'attr changed'
       - content18 == expected18
 
 
-- name: "test-values 19 - Ensure non-existant 'beverage=coke' is 'abesent' in section '[drinks]'"
-  ini_file:
+- name: "test-values 19 - Ensure non-existant 'beverage=coke' is 'abesent' in stanza '[drinks]'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: beverage
+    stanza: drinks
+    attr: beverage
     values:
       - coke
     state: absent
@@ -497,17 +497,17 @@
       - result19.msg == 'OK'
 
 
-- name: test-values 20 - remove section 'drinks'
-  ini_file:
+- name: test-values 20 - remove stanza 'drinks'
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
+    stanza: drinks
     state: absent
   register: result20
 
-- name: test-values 20 - remove section 'drinks' again to ensure idempotency"
-  ini_file:
+- name: test-values 20 - remove stanza 'drinks' again to ensure idempotency"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
+    stanza: drinks
     state: absent
   register: result20_remove_again  
 
@@ -525,15 +525,15 @@
     that:
       - result20 is changed
       - result20_remove_again is not changed
-      - result20.msg == 'section removed'
+      - result20.msg == 'stanza removed'
       - content20 == "\n"
 
 
-- name: "test-values 21 - Ensure 'refreshment=[water, juice, soft drink, juice]' (duplicates removed) is 'present' in section '[drinks]'"
-  ini_file:
+- name: "test-values 21 - Ensure 'refreshment=[water, juice, soft drink, juice]' (duplicates removed) is 'present' in stanza '[drinks]'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: refreshment
+    stanza: drinks
+    attr: refreshment
     values:
       - water
       - juice
@@ -561,7 +561,7 @@
   assert:
     that:
       - result21 is changed
-      - result21.msg == 'section and option added'
+      - result21.msg == 'stanza and attr added'
       - content21 == expected21
 
 
@@ -573,22 +573,22 @@
       [mysqld]
       connect_timeout = 300
       max_connections = 1000
-      [section1]
+      [stanza1]
       var1 = aaa
-      # comment in section
+      # comment in stanza
       var2 = foo
       # var2 = bar
 
-      [section2]
+      [stanza2]
       var3 = ccc
-      # comment after section
+      # comment after stanza
     dest: "{{ output_file }}"
 
-- name: "test-values 22 - Ensure 'skip-name' with 'allow_no_value' is 'present' in section '[mysqld]' test allow_no_value"
-  ini_file:
+- name: "test-values 22 - Ensure 'skip-name' with 'allow_no_value' is 'present' in stanza '[mysqld]' test allow_no_value"
+  stanza_file:
     path: "{{ output_file }}"
-    section: mysqld
-    option: skip-name
+    stanza: mysqld
+    attr: skip-name
     allow_no_value: true
     state: present
   register: result22
@@ -607,30 +607,30 @@
       connect_timeout = 300
       max_connections = 1000
       skip-name
-      [section1]
+      [stanza1]
       var1 = aaa
-      # comment in section
+      # comment in stanza
       var2 = foo
       # var2 = bar
 
-      [section2]
+      [stanza2]
       var3 = ccc
-      # comment after section
+      # comment after stanza
     content22: "{{ output_content.content | b64decode }}"
 
-- name: test-values 22 - assert 'changed' is true and content is OK and option added
+- name: test-values 22 - assert 'changed' is true and content is OK and attr added
   assert:
     that:
       - result22 is changed
-      - result22.msg == 'option added'
+      - result22.msg == 'attr added'
       - content22 == expected22
 
 
-- name: "test-values 23 - Ensure 'var2=[foo, foobar]' is 'present' in section '[section1]'"
-  ini_file:
+- name: "test-values 23 - Ensure 'var2=[foo, foobar]' is 'present' in stanza '[stanza1]'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: section1
-    option: var2
+    stanza: stanza1
+    attr: var2
     values: 
       - foo
       - foobar
@@ -652,29 +652,29 @@
       connect_timeout = 300
       max_connections = 1000
       skip-name
-      [section1]
+      [stanza1]
       var1 = aaa
-      # comment in section
+      # comment in stanza
       var2 = foo
       var2 = foobar
       # var2 = bar
 
-      [section2]
+      [stanza2]
       var3 = ccc
-      # comment after section
-- name: test-values 23 - assert 'changed' and msg 'option added' and content is as expected
+      # comment after stanza
+- name: test-values 23 - assert 'changed' and msg 'attr added' and content is as expected
   assert:
     that:
       - result23 is changed
-      - result23.msg == 'option added'
+      - result23.msg == 'attr added'
       - content23 == expected23
 
 
-- name: "test-values 24 - Ensure 'var2=[foo, foobar, bar]' is 'present' in section '[section1]' replacing commented option 'var2=bar'"
-  ini_file:
+- name: "test-values 24 - Ensure 'var2=[foo, foobar, bar]' is 'present' in stanza '[stanza1]' replacing commented attr 'var2=bar'"
+  stanza_file:
     path: "{{ output_file }}"
-    section: section1
-    option: var2
+    stanza: stanza1
+    attr: var2
     values: 
       - foo
       - bar
@@ -697,21 +697,21 @@
       connect_timeout = 300
       max_connections = 1000
       skip-name
-      [section1]
+      [stanza1]
       var1 = aaa
-      # comment in section
+      # comment in stanza
       var2 = foo
       var2 = foobar
       var2 = bar
 
-      [section2]
+      [stanza2]
       var3 = ccc
-      # comment after section
-- name: test-values 24 - assert 'added' and msg 'option changed' and content is as expected
+      # comment after stanza
+- name: test-values 24 - assert 'added' and msg 'attr changed' and content is as expected
   assert:
     that:
       - result24 is changed
-      - result24.msg == 'option changed'
+      - result24.msg == 'attr changed'
       - content24 == expected24
 
 
@@ -721,11 +721,11 @@
     dest: "{{ output_file }}"
     force: yes
 
-- name: "test-values 25 - Ensure 'beverage=[coke, pepsi]' is created within no section"
-  ini_file:
-    section:
+- name: "test-values 25 - Ensure 'beverage=[coke, pepsi]' is created within no stanza"
+  stanza_file:
+    stanza:
     path: "{{ output_file }}"
-    option: beverage
+    attr: beverage
     values:
       - coke
       - pepsi
@@ -745,22 +745,22 @@
 
     content25: "{{ output_content.content | b64decode }}"
 
-- name: test-values 25 - assert 'changed' is true and content is OK (no section)
+- name: test-values 25 - assert 'changed' is true and content is OK (no stanza)
   assert:
     that:
       - result25 is changed
-      - result25.msg == 'option added'
+      - result25.msg == 'attr added'
       - content25 == expected25
 
 
-- name: "test-values 26 - Ensure 'beverage=coke' and 'beverage=pepsi' are modified within no section"
-  ini_file:
+- name: "test-values 26 - Ensure 'beverage=coke' and 'beverage=pepsi' are modified within no stanza"
+  stanza_file:
     path: "{{ output_file }}"
-    option: beverage
+    attr: beverage
     values:
       - water
       - orange juice
-    section:
+    stanza:
     state: present
     exclusive: true
   register: result26
@@ -778,19 +778,19 @@
       
     content26: "{{ output_content.content | b64decode }}"
 
-- name: test-values 26 - assert 'changed' is true and content is OK (no section)
+- name: test-values 26 - assert 'changed' is true and content is OK (no stanza)
   assert:
     that:
       - result26 is changed
-      - result26.msg == 'option changed'
+      - result26.msg == 'attr changed'
       - content26 == expected26
 
 
-- name: "test-values 27 - ensure option 'beverage' is 'absent' within no section"
-  ini_file:
-    section:
+- name: "test-values 27 - ensure attr 'beverage' is 'absent' within no stanza"
+  stanza_file:
+    stanza:
     path: "{{ output_file }}"
-    option: beverage
+    attr: beverage
     state: absent
   register: result27
 
@@ -803,31 +803,31 @@
   set_fact:
     content27: "{{ output_content.content | b64decode }}"
 
-- name: test-values 27 - assert changed (no section)
+- name: test-values 27 - assert changed (no stanza)
   assert:
     that:
       - result27 is changed
-      - result27.msg == 'option changed'
+      - result27.msg == 'attr changed'
       - content27 == "\n"
 
 
-- name: "test-values 28 - Ensure option 'present' without section before existing section"
+- name: "test-values 28 - Ensure attr 'present' without stanza before existing stanza"
   block:
-    - name: test-values 28 - ensure option present within section
-      ini_file:
+    - name: test-values 28 - ensure attr present within stanza
+      stanza_file:
         path: "{{ output_file }}"
-        section: drinks
-        option: beverage
+        stanza: drinks
+        attr: beverage
         values: 
           - water
           - orange juice
         state: present
 
-    - name: test-values 28 - ensure option present without section
-      ini_file:
+    - name: test-values 28 - ensure attr present without stanza
+      stanza_file:
         path: "{{ output_file }}"
-        section:
-        option: like
+        stanza:
+        attr: like
         values:
           - tea
           - coffee
@@ -865,11 +865,11 @@
       beverage = orange juice
     dest: "{{ output_file }}"
 
-- name: "test-value 29 - Test 'state=absent' with 'exclusive=true' with multiple options in ini_file"
-  ini_file:
+- name: "test-value 29 - Test 'state=absent' with 'exclusive=true' with multiple attrs in stanza_file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - cocktail
     state: absent
@@ -892,7 +892,7 @@
   assert:
     that:
       - result29 is changed
-      - result29.msg == 'option changed'
+      - result29.msg == 'attr changed'
       - content29 == expected29
 
 
@@ -906,11 +906,11 @@
       beverage = orange juice
     dest: "{{ output_file }}"
 
-- name: "test-value 30 - Test 'state=absent' with 'exclusive=false' with multiple options in ini_file"
-  ini_file:
+- name: "test-value 30 - Test 'state=absent' with 'exclusive=false' with multiple attrs in stanza_file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     values:
       - cocktail
     state: absent
@@ -935,7 +935,7 @@
   assert:
     that:
       - result30 is changed
-      - result30.msg == 'option changed'
+      - result30.msg == 'attr changed'
       - content30 == expected30
 
 
@@ -949,11 +949,11 @@
       beverage = orange juice
     dest: "{{ output_file }}"
 
-- name: "test-value 31 - Test 'state=absent' with 'exclusive=true' and no value given with multiple options in ini_file"
-  ini_file:
+- name: "test-value 31 - Test 'state=absent' with 'exclusive=true' and no value given with multiple attrs in stanza_file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     state: absent
   register: result31
 
@@ -974,7 +974,7 @@
   assert:
     that:
       - result31 is changed
-      - result31.msg == 'option changed'
+      - result31.msg == 'attr changed'
       - content31 == expected31
 
 
@@ -988,11 +988,11 @@
       beverage = orange juice
     dest: "{{ output_file }}"
 
-- name: "test-value 32 - Test 'state=absent' with 'exclusive=false' and no value given with multiple options in ini_file"
-  ini_file:
+- name: "test-value 32 - Test 'state=absent' with 'exclusive=false' and no value given with multiple attrs in stanza_file"
+  stanza_file:
     path: "{{ output_file }}"
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     state: absent
     exclusive: false
   register: result32
