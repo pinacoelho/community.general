@@ -183,8 +183,8 @@ def update_stanza_line(changed, stanza_lines, index, changed_lines, newline, msg
 
 
 def do_stanza(module, filename, stanza=None, attr=None, values=None,
-           state='present', exclusive=True, backup=False, no_extra_spaces=False,
-           create=True, allow_no_value=False):
+              state='present', exclusive=True, backup=False, no_extra_spaces=False,
+              create=True, allow_no_value=False):
 
     if stanza is not None:
         stanza = to_text(stanza)
