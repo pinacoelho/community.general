@@ -18,7 +18,7 @@ extends_documentation_fragment: files
 description:
      - Manage (add, remove, change) individual settings in a stanza-style file without having
        to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
-     - Adds missing sections if they don't exist.
+     - Adds missing stanzas if they don't exist.
      - Before Ansible 2.0, comments are discarded when the source file is read, and therefore will not show up in the destination file.
      - Since Ansible 2.3, this module adds missing ending newlines to files to keep in line with the POSIX standard, even when
        no other modifications need to be applied.
@@ -30,30 +30,30 @@ options:
     type: path
     required: true
     aliases: [ dest ]
-  section:
+  stanza:
     description:
-      - Section name in stanza file. This is added if C(state=present) automatically when
+      - Stanza name in stanza file. This is added if C(state=present) automatically when
         a single value is being set.
-      - If left empty or set to C(null), the I(option) will be placed before the first I(section).
-      - Using C(null) is also required if the config format does not support sections.
+      - If left empty or set to C(null), the I(attr) will be placed before the first I(stanza).
+      - Using C(null) is also required if the config format does not support stanzas.
     type: str
     required: true
-  option:
+  attr:
     description:
-      - If set (required for changing a I(value)), this is the name of the option.
-      - May be omitted if adding/removing a whole I(section).
+      - If set (required for changing a I(value)), this is the name of the attr.
+      - May be omitted if adding/removing a whole I(stanza).
     type: str
   value:
     description:
-      - The string value to be associated with an I(option).
-      - May be omitted when removing an I(option).
+      - The string value to be associated with an I(attr).
+      - May be omitted when removing an I(attr).
       - Mutually exclusive with I(values).
       - I(value=v) is equivalent to I(values=[v]).
     type: str
   values:
     description:
-      - The string value to be associated with an I(option).
-      - May be omitted when removing an I(option).
+      - The string value to be associated with an I(attr).
+      - May be omitted when removing an I(attr).
       - Mutually exclusive with I(value).
       - I(value=v) is equivalent to I(values=[v]).
     type: list
@@ -67,19 +67,19 @@ options:
     default: no
   state:
     description:
-      - If set to C(absent) and I(exclusive) set to C(yes) all matching I(option) lines are removed.
-      - If set to C(absent) and I(exclusive) set to C(no) the specified C(option=value) lines are removed,
-        but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(no) the specified C(option=values) lines are added,
-        but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(yes) all given C(option=values) lines will be
-        added and the other I(option)s with the same name are removed.
+      - If set to C(absent) and I(exclusive) set to C(yes) all matching I(attr) lines are removed.
+      - If set to C(absent) and I(exclusive) set to C(no) the specified C(attr=value) lines are removed,
+        but the other I(attr)s with the same name are not touched.
+      - If set to C(present) and I(exclusive) set to C(no) the specified C(attr=values) lines are added,
+        but the other I(attr)s with the same name are not touched.
+      - If set to C(present) and I(exclusive) set to C(yes) all given C(attr=values) lines will be
+        added and the other I(attr)s with the same name are removed.
     type: str
     choices: [ absent, present ]
     default: present
   exclusive:
     description:
-      - If set to C(yes) (default), all matching I(option) lines are removed when I(state=absent),
+      - If set to C(yes) (default), all matching I(attr) lines are removed when I(state=absent),
         or replaced when I(state=present).
       - If set to C(no), only the specified I(value(s)) are added when I(state=present),
         or removed when I(state=absent), and existing ones are not modified.
@@ -99,12 +99,12 @@ options:
     default: yes
   allow_no_value:
     description:
-      - Allow option without value and without '=' symbol.
+      - Allow attr without value and without '=' symbol.
     type: bool
     default: no
 notes:
-   - While it is possible to add an I(option) without specifying a I(value), this makes no sense.
-   - As of Ansible 2.3, the I(dest) option has been changed to I(path) as default, but I(dest) still works as well.
+   - While it is possible to add an I(attr) without specifying a I(value), this makes no sense.
+   - As of Ansible 2.3, the I(dest) attr has been changed to I(path) as default, but I(dest) still works as well.
    - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
 author:
     - Jan-Piet Mens (@jpmens)
@@ -113,38 +113,38 @@ author:
 
 EXAMPLES = r'''
 # Before Ansible 2.3, option 'dest' was used instead of 'path'
-- name: Ensure "fav=lemonade is in section "[drinks]" in specified file
+- name: Ensure "fav=lemonade is in stanza "drinks:" in specified file
   community.general.stanza_file:
     path: /etc/conf
-    section: drinks
-    option: fav
+    stanza: drinks
+    attr: fav
     value: lemonade
     mode: '0600'
     backup: yes
 
-- name: Ensure "temperature=cold is in section "[drinks]" in specified file
+- name: Ensure "temperature=cold is in stanza "drinks:" in specified file
   community.general.stanza_file:
     path: /etc/anotherconf
-    section: drinks
-    option: temperature
+    stanza: drinks
+    attr: temperature
     value: cold
     backup: yes
 
-- name: Add "beverage=lemon juice" is in section "[drinks]" in specified file
+- name: Add "beverage=lemon juice" is in stanza "drinks:" in specified file
   community.general.stanza_file:
     path: /etc/conf
-    section: drinks
-    option: beverage
+    stanza: drinks
+    attr: beverage
     value: lemon juice
     mode: '0600'
     state: present
     exclusive: no
 
-- name: Ensure multiple values "beverage=coke" and "beverage=pepsi" are in section "[drinks]" in specified file
+- name: Ensure multiple values "beverage=coke" and "beverage=pepsi" are in stanza "drinks:" in specified file
   community.general.stanza_file:
     path: /etc/conf
-    section: drinks
-    option: beverage
+    stanza: drinks
+    attr: beverage
     values:
       - coke
       - pepsi
@@ -162,34 +162,34 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
-def match_opt(option, line):
-    option = re.escape(option)
-    return re.match('[#;]?( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+def match_attr(attr, line):
+    attr = re.escape(attr)
+    return re.match('[#;]?( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % attr, line)
 
 
-def match_active_opt(option, line):
-    option = re.escape(option)
-    return re.match('( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+def match_active_attr(attr, line):
+    attr = re.escape(attr)
+    return re.match('( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % attr, line)
 
 
-def update_section_line(changed, section_lines, index, changed_lines, newline, msg):
-    option_changed = section_lines[index] != newline
-    changed = changed or option_changed
-    if option_changed:
-        msg = 'option changed'
-    section_lines[index] = newline
+def update_stanza_line(changed, stanza_lines, index, changed_lines, newline, msg):
+    attr_changed = stanza_lines[index] != newline
+    changed = changed or attr_changed
+    if attr_changed:
+        msg = 'attr changed'
+    stanza_lines[index] = newline
     changed_lines[index] = 1
     return (changed, msg)
 
 
-def do_stanza(module, filename, section=None, option=None, values=None,
+def do_stanza(module, filename, stanza=None, attr=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
            create=True, allow_no_value=False):
 
-    if section is not None:
-        section = to_text(section)
-    if option is not None:
-        option = to_text(option)
+    if stanza is not None:
+        stanza = to_text(stanza)
+    if attr is not None:
+        attr = to_text(attr)
 
     # deduplicate entries in values
     values_unique = []
@@ -228,11 +228,11 @@ def do_stanza(module, filename, section=None, option=None, values=None,
         stanza_lines[-1] += u'\n'
         changed = True
 
-    # append fake section lines to simplify the logic
+    # append fake stanza lines to simplify the logic
     # At top:
-    # Fake random section to do not match any other in the file
-    # Using commit hash as fake section name
-    fake_section_name = u"ad01e11446efb704fcdbdb21f2c43757423d91c5"
+    # Fake random stanza to do not match any other in the file
+    # Using commit hash as fake stanza name
+    fake_stanza_name = u"ad01e11446efb704fcdbdb21f2c43757423d91c5"
 
     # Insert it at the beginning
     stanza_lines.insert(0, u'[%s]' % fake_section_name)
@@ -240,155 +240,155 @@ def do_stanza(module, filename, section=None, option=None, values=None,
     # At bottom:
     stanza_lines.append(u'[')
 
-    # If no section is defined, fake section is used
-    if not section:
-        section = fake_section_name
+    # If no stanza is defined, fake stanza is used
+    if not stanza:
+        stanza = fake_stanza_name
 
-    within_section = not section
-    section_start = section_end = 0
+    within_stanza = not stanza
+    stanza_start = stanza_end = 0
     msg = 'OK'
     if no_extra_spaces:
         assignment_format = u'%s=%s\n'
     else:
         assignment_format = u'%s = %s\n'
 
-    option_no_value_present = False
+    attr_no_value_present = False
 
     non_blank_non_comment_pattern = re.compile(to_text(r'^[ \t]*([#;].*)?$'))
 
     before = after = []
-    section_lines = []
+    stanza_lines = []
 
     for index, line in enumerate(stanza_lines):
-        # find start and end of section
-        if line.startswith(u'[%s]' % section):
-            within_section = True
-            section_start = index
+        # find start and end of stanza
+        if line.startswith(u'[%s]' % stanza):
+            within_stanza = True
+            stanza_start = index
         elif line.startswith(u'['):
-            if within_section:
-                section_end = index
+            if within_stanza:
+                stanza_end = index
                 break
 
-    before = stanza_lines[0:section_start]
-    section_lines = stanza_lines[section_start:section_end]
-    after = stanza_lines[section_end:len(stanza_lines)]
+    before = stanza_lines[0:stanza_start]
+    stanza_lines = stanza_lines[stanza_start:stanza_end]
+    after = stanza_lines[stanza_end:len(stanza_lines)]
 
-    # Keep track of changed section_lines
-    changed_lines = [0] * len(section_lines)
+    # Keep track of changed stanza_lines
+    changed_lines = [0] * len(stanza_lines)
 
-    # handling multiple instances of option=value when state is 'present' with/without exclusive is a bit complex
+    # handling multiple instances of attr=value when state is 'present' with/without exclusive is a bit complex
     #
-    # 1. edit all lines where we have a option=value pair with a matching value in values[]
-    # 2. edit all the remaing lines where we have a matching option
-    # 3. delete remaining lines where we have a matching option
-    # 4. insert missing option line(s) at the end of the section
+    # 1. edit all lines where we have a attr=value pair with a matching value in values[]
+    # 2. edit all the remaing lines where we have a matching attr
+    # 3. delete remaining lines where we have a matching attr
+    # 4. insert missing attr line(s) at the end of the stanza
 
-    if state == 'present' and option:
-        for index, line in enumerate(section_lines):
-            if match_opt(option, line):
-                match = match_opt(option, line)
+    if state == 'present' and attr:
+        for index, line in enumerate(stanza_lines):
+            if match_attr(attr, line):
+                match = match_attr(attr, line)
                 if values and match.group(6) in values:
                     matched_value = match.group(6)
                     if not matched_value and allow_no_value:
-                        # replace existing option with no value line(s)
-                        newline = u'%s\n' % option
-                        option_no_value_present = True
+                        # replace existing attr with no value line(s)
+                        newline = u'%s\n' % attr
+                        attr_no_value_present = True
                     else:
-                        # replace existing option=value line(s)
-                        newline = assignment_format % (option, matched_value)
-                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                        # replace existing attr=value line(s)
+                        newline = assignment_format % (attr, matched_value)
+                    (changed, msg) = update_stanza_line(changed, stanza_lines, index, changed_lines, newline, msg)
                     values.remove(matched_value)
                 elif not values and allow_no_value:
-                    # replace existing option with no value line(s)
-                    newline = u'%s\n' % option
-                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
-                    option_no_value_present = True
+                    # replace existing attr with no value line(s)
+                    newline = u'%s\n' % attr
+                    (changed, msg) = update_stanza_line(changed, stanza_lines, index, changed_lines, newline, msg)
+                    attr_no_value_present = True
                     break
 
     if state == 'present' and exclusive and not allow_no_value:
-        # override option with no value to option with value if not allow_no_value
+        # override attr with no value to attr with value if not allow_no_value
         if len(values) > 0:
-            for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_active_opt(option, section_lines[index]):
-                    newline = assignment_format % (option, values.pop(0))
-                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+            for index, line in enumerate(stanza_lines):
+                if not changed_lines[index] and match_active_attr(attr, stanza_lines[index]):
+                    newline = assignment_format % (attr, values.pop(0))
+                    (changed, msg) = update_stanza_line(changed, stanza_lines, index, changed_lines, newline, msg)
                     if len(values) == 0:
                         break
-        # remove all remaining option occurrences from the rest of the section
-        for index in range(len(section_lines) - 1, 0, -1):
-            if not changed_lines[index] and match_active_opt(option, section_lines[index]):
-                del section_lines[index]
+        # remove all remaining attr occurrences from the rest of the stanza
+        for index in range(len(stanza_lines) - 1, 0, -1):
+            if not changed_lines[index] and match_active_attr(attr, stanza_lines[index]):
+                del stanza_lines[index]
                 del changed_lines[index]
                 changed = True
-                msg = 'option changed'
+                msg = 'attr changed'
 
     if state == 'present':
-        # insert missing option line(s) at the end of the section
-        for index in range(len(section_lines), 0, -1):
+        # insert missing attr line(s) at the end of the stanza
+        for index in range(len(stanza_lines), 0, -1):
             # search backwards for previous non-blank or non-comment line
-            if not non_blank_non_comment_pattern.match(section_lines[index - 1]):
-                if option and values:
-                    # insert option line(s)
+            if not non_blank_non_comment_pattern.match(stanza_lines[index - 1]):
+                if attr and values:
+                    # insert attr line(s)
                     for element in values[::-1]:
                         # items are added backwards, so traverse the list backwards to not confuse the user
-                        # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
+                        # otherwise some of their attrs might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
                         if element is not None:
-                            # insert option=value line
-                            section_lines.insert(index, assignment_format % (option, element))
-                            msg = 'option added'
+                            # insert attr=value line
+                            stanza_lines.insert(index, assignment_format % (attr, element))
+                            msg = 'attr added'
                             changed = True
                         elif element is None and allow_no_value:
-                            # insert option with no value line
-                            section_lines.insert(index, u'%s\n' % option)
-                            msg = 'option added'
+                            # insert attr with no value line
+                            stanza_lines.insert(index, u'%s\n' % attr)
+                            msg = 'attr added'
                             changed = True
-                elif option and not values and allow_no_value and not option_no_value_present:
-                    # insert option with no value line(s)
-                    section_lines.insert(index, u'%s\n' % option)
-                    msg = 'option added'
+                elif attr and not values and allow_no_value and not attr_no_value_present:
+                    # insert attr with no value line(s)
+                    stanza_lines.insert(index, u'%s\n' % attr)
+                    msg = 'attr added'
                     changed = True
                 break
 
     if state == 'absent':
-        if option:
+        if attr:
             if exclusive:
-                # delete all option line(s) with given option and ignore value
-                new_section_lines = [line for line in section_lines if not (match_active_opt(option, line))]
-                if section_lines != new_section_lines:
+                # delete all attr line(s) with given attr and ignore value
+                new_stanza_lines = [line for line in stanza_lines if not (match_active_attr(attr, line))]
+                if stanza_lines != new_stanza_lines:
                     changed = True
-                    msg = 'option changed'
-                    section_lines = new_section_lines
+                    msg = 'attr changed'
+                    stanza_lines = new_stanza_lines
             elif not exclusive and len(values) > 0:
-                # delete specified option=value line(s)
-                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(6) in values)]
-                if section_lines != new_section_lines:
+                # delete specified attr=value line(s)
+                new_stanza_lines = [i for i in stanza_lines if not (match_active_attr(attr, i) and match_active_attr(attr, i).group(6) in values)]
+                if stanza_lines != new_stanza_lines:
                     changed = True
-                    msg = 'option changed'
-                    section_lines = new_section_lines
+                    msg = 'attr changed'
+                    stanza_lines = new_stanza_lines
         else:
-            # drop the entire section
-            if section_lines:
-                section_lines = []
-                msg = 'section removed'
+            # drop the entire stanza
+            if stanza_lines:
+                stanza_lines = []
+                msg = 'stanza removed'
                 changed = True
 
     # reassemble the stanza_lines after manipulation
-    stanza_lines = before + section_lines + after
+    stanza_lines = before + stanza_lines + after
 
-    # remove the fake section line
+    # remove the fake stanza line
     del stanza_lines[0]
     del stanza_lines[-1:]
 
-    if not within_section and state == 'present':
-        stanza_lines.append(u'[%s]\n' % section)
-        msg = 'section and option added'
-        if option and values:
+    if not within_stanza and state == 'present':
+        stanza_lines.append(u'[%s]\n' % stanza)
+        msg = 'stanza and attr added'
+        if attr and values:
             for value in values:
-                stanza_lines.append(assignment_format % (option, value))
-        elif option and not values and allow_no_value:
-            stanza_lines.append(u'%s\n' % option)
+                stanza_lines.append(assignment_format % (attr, value))
+        elif attr and not values and allow_no_value:
+            stanza_lines.append(u'%s\n' % attr)
         else:
-            msg = 'only section added'
+            msg = 'only stanza added'
         changed = True
 
     if module._diff:
@@ -422,8 +422,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['dest']),
-            section=dict(type='str', required=True),
-            option=dict(type='str'),
+            stanza=dict(type='str', required=True),
+            attr=dict(type='str'),
             value=dict(type='str'),
             values=dict(type='list', elements='str'),
             backup=dict(type='bool', default=False),
@@ -441,8 +441,8 @@ def main():
     )
 
     path = module.params['path']
-    section = module.params['section']
-    option = module.params['option']
+    stanza = module.params['stanza']
+    attr = module.params['attr']
     value = module.params['value']
     values = module.params['values']
     state = module.params['state']
@@ -460,7 +460,7 @@ def main():
     elif values is None:
         values = []
 
-    (changed, backup_file, diff, msg) = do_stanza(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value)
+    (changed, backup_file, diff, msg) = do_stanza(module, path, stanza, attr, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
