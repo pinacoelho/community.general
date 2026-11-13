@@ -1,70 +1,76 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - vars:
-    package_name: xinetd
-    config_file: /etc/xinetd.conf
+    package_name: mdadm
+    config_file: /etc/mdadm.conf
   block:
     - name: Make sure that {{ package_name }} is not installed
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
+
     - name: Make sure {{config_file}}.pacsave file doesn't exist
-      file:
+      ansible.builtin.file:
         path: '{{config_file}}.pacsave'
         state: absent
 
     - name: Install {{ package_name }}
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
 
     - name: Modify {{config_file}}
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: '{{config_file}}'
         block: |
           # something something
           # on 2 lines
 
     - name: Remove {{ package_name }} - generate pacsave
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
+
     - name: Make sure {{config_file}}.pacsave exists
-      stat:
+      ansible.builtin.stat:
         path: '{{config_file}}.pacsave'
       register: pacsave_st_1
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - pacsave_st_1.stat.exists
 
     - name: Delete {{config_file}}.pacsave
-      file:
+      ansible.builtin.file:
         path: '{{config_file}}.pacsave'
         state: absent
 
     - name: Install {{ package_name }}
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
 
     - name: Modify {{config_file}}
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: '{{config_file}}'
         block: |
           # something something
           # on 2 lines
 
     - name: Remove {{ package_name }} - nosave
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
-        remove_nosave: yes
+        remove_nosave: true
         state: absent
 
     - name: Make sure {{config_file}}.pacsave does not exist
-      stat:
+      ansible.builtin.stat:
         path: '{{config_file}}.pacsave'
       register: pacsave_st_2
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - not pacsave_st_2.stat.exists

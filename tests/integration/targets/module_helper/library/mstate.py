@@ -1,13 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: mstate
 author: "Alexei Znamensky (@russoz)"
 short_description: State-based module for testing
@@ -17,59 +16,52 @@ options:
   a:
     description: aaaa
     type: int
-    required: yes
+    required: true
   b:
     description: bbbb
     type: str
   c:
     description: cccc
     type: str
-  trigger_depr_attr:
-    description: tries to access VarDict
-    type: bool
-    default: false
   state:
     description: test states
     type: str
     choices: [join, b_x_a, c_x_a, both_x_a]
     default: join
-'''
+"""
 
 EXAMPLES = ""
 
 RETURN = ""
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
 class MState(StateModuleHelper):
-    output_params = ('a', 'b', 'c', 'state')
+    output_params = ("a", "b", "c", "state")
     module = dict(
         argument_spec=dict(
-            a=dict(type='int', required=True),
-            b=dict(type='str'),
-            c=dict(type='str'),
-            trigger_depr_attr=dict(type='bool', default=False),
-            state=dict(type='str', choices=['join', 'b_x_a', 'c_x_a', 'both_x_a', 'nop'], default='join'),
+            a=dict(type="int", required=True),
+            b=dict(type="str"),
+            c=dict(type="str"),
+            state=dict(type="str", choices=["join", "b_x_a", "c_x_a", "both_x_a", "nop"], default="join"),
         ),
     )
 
     def __init_module__(self):
-        self.vars.set('result', "abc", diff=True)
-        if self.vars.trigger_depr_attr:
-            dummy = self.VarDict
+        self.vars.set("result", "abc", diff=True)
 
     def state_join(self):
-        self.vars['result'] = "".join([str(self.vars.a), str(self.vars.b), str(self.vars.c)])
+        self.vars["result"] = "".join([str(self.vars.a), str(self.vars.b), str(self.vars.c)])
 
     def state_b_x_a(self):
-        self.vars['result'] = str(self.vars.b) * self.vars.a
+        self.vars["result"] = str(self.vars.b) * self.vars.a
 
     def state_c_x_a(self):
-        self.vars['result'] = str(self.vars.c) * self.vars.a
+        self.vars["result"] = str(self.vars.c) * self.vars.a
 
     def state_both_x_a(self):
-        self.vars['result'] = (str(self.vars.b) + str(self.vars.c)) * self.vars.a
+        self.vars["result"] = (str(self.vars.b) + str(self.vars.c)) * self.vars.a
 
     def state_nop(self):
         pass
@@ -80,5 +72,5 @@ def main():
     mstate.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

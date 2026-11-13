@@ -1,11 +1,10 @@
-# (c) 2012-2014, Michael DeHaan <michael.dehaan@gmail.com>
-# (c) 2021 Ansible Project
+# Copyright (c) 2012-2014, Michael DeHaan <michael.dehaan@gmail.com>
+# Copyright (c) 2021 Ansible Project
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 import re
 
@@ -20,31 +19,42 @@ def test_sudosu(mocker, parser, reset_cli_args):
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
-    sudo_exe = 'sudo'
-    sudo_flags = '-H -s -n'
+    sudo_exe = "sudo"
+    sudo_flags = "-H -s -n"
 
-    success = 'BECOME-SUCCESS-.+?'
+    success = "BECOME-SUCCESS-.+?"
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.sudosu',
-        'become_flags': sudo_flags,
+        "become_user": "foo",
+        "become_method": "community.general.sudosu",
+        "become_flags": sudo_flags,
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s  su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags, task['become_user'],
-                                                                  default_exe, success, default_cmd), cmd) is not None)
+    assert (
+        re.match(
+            f"""{sudo_exe} {sudo_flags}  su -l {task["become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
+            cmd,
+        )
+        is not None
+    )
 
     task = {
-        'become_user': 'foo',
-        'become_method': 'community.general.sudosu',
-        'become_flags': sudo_flags,
-        'become_pass': 'testpass',
+        "become_user": "foo",
+        "become_method": "community.general.sudosu",
+        "become_flags": sudo_flags,
+        "become_pass": "testpass",
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s -p "%s" su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags.replace('-n', ''),
-                                                                         r"\[sudo via ansible, key=.+?\] password:", task['become_user'],
-                                                                         default_exe, success, default_cmd), cmd) is not None)
+    password_pattern = r"\[sudo via ansible, key=.+?\] password:"
+    assert (
+        re.match(
+            f"""{sudo_exe} {sudo_flags.replace("-n", "")} -p "{password_pattern}" """
+            f"""su -l {task["become_user"]} {default_exe} -c 'echo {success}; {default_cmd}'""",
+            cmd,
+        )
+        is not None
+    )

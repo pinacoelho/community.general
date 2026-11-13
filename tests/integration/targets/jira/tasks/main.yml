@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: create test ticket
   community.general.jira:
     uri: "{{ uri }}"
@@ -10,10 +14,10 @@
     description: bla bla bla
     issuetype: Task
   register: issue
-- debug:
+- ansible.builtin.debug:
     msg: Issue={{ issue }}
 - name: assert test ticket
-  assert:
+  ansible.builtin.assert:
     that:
       - issue is changed
       - issue.meta.key.startswith(proj)
@@ -28,7 +32,7 @@
     comment: bleep bleep!
   register: comment_bleep_bleep
 - name: assert comment bleep bleep
-  assert:
+  ansible.builtin.assert:
     that:
       - comment_bleep_bleep is changed
       - comment_bleep_bleep.meta.body == "bleep bleep!"
@@ -45,7 +49,7 @@
     comment: -> in progress
   register: transition_inprog
 - name: assert transition -> In Progress with comment
-  assert:
+  ansible.builtin.assert:
     that:
       - transition_inprog is changed
 
@@ -59,9 +63,27 @@
     account_id: "{{ user2 }}"
   register: assign
 - name: assert change assignee
-  assert:
+  ansible.builtin.assert:
     that:
       - assign is changed
+
+- name: Worklog on issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: Worklog
+    fields:
+      timeSpentSeconds: 1200
+  register: worklog
+- name: assert worklog -> with comment
+  ansible.builtin.assert:
+    that:
+      - worklog is changed
+      - worklog.meta.comment == 'Worklog'
+      - worklog.meta.timeSpentSeconds == 1200
 
 - name: transition -> Resolved with comment
   community.general.jira:
@@ -79,11 +101,11 @@
       description: wakawakawakawaka
   register: transition_resolved
 - name: assert transition -> Resolved with comment
-  assert:
+  ansible.builtin.assert:
     that:
       - transition_resolved is changed
 
-- debug:
+- ansible.builtin.debug:
     msg:
       - Issue = {{ issue.meta.key }}
       - URL = {{ issue.meta.self }}

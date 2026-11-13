@@ -1,6 +1,10 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: 'Remove any node modules'
-  file:
+  ansible.builtin.file:
     path: '{{ remote_dir }}/node_modules'
     state: absent
 
@@ -9,52 +13,52 @@
     node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
     package: 'ncp'
   block:
-    - shell: npm --version
+    - ansible.builtin.command: npm --version
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_version
 
-    - debug:
+    - ansible.builtin.debug:
         var: npm_version.stdout
 
     - name: 'Install simple package with no_bin_links disabled'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         executable: '{{ node_path }}/npm'
         state: present
         name: '{{ package }}'
         no_bin_links: false
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_install_no_bin_links_disabled
 
     - name: 'Make sure .bin folder has been created'
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_dir }}/node_modules/.bin"
       register: npm_dotbin_folder_disabled
 
     - name: 'Remove any node modules'
-      file:
+      ansible.builtin.file:
         path: '{{ remote_dir }}/node_modules'
         state: absent
 
     - name: 'Install simple package with no_bin_links enabled'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         executable: '{{ node_path }}/npm'
         state: present
         name: '{{ package }}'
         no_bin_links: true
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_install_no_bin_links_enabled
 
     - name: 'Make sure .bin folder has not been created'
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_dir }}/node_modules/.bin"
       register: npm_dotbin_folder_enabled
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - npm_install_no_bin_links_disabled is success
           - npm_install_no_bin_links_disabled is changed

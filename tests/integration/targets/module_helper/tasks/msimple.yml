@@ -1,5 +1,6 @@
-# (c) 2021, Alexei Znamensky
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: test msimple (set a=80)
   msimple:
@@ -7,7 +8,7 @@
   register: simple1
 
 - name: assert simple1
-  assert:
+  ansible.builtin.assert:
     that:
       - simple1.a == 80
       - simple1.abc == "abc"
@@ -17,11 +18,11 @@
 - name: test msimple 2
   msimple:
     a: 101
-  ignore_errors: yes
+  ignore_errors: true
   register: simple2
 
 - name: assert simple2
-  assert:
+  ansible.builtin.assert:
     that:
       - simple2.a == 101
       - 'simple2.msg == "Module failed with exception: a >= 100"'
@@ -37,7 +38,7 @@
   register: simple3
 
 - name: assert simple3
-  assert:
+  ansible.builtin.assert:
     that:
       - simple3.a == 2
       - simple3.b == "potatoespotatoes"
@@ -50,7 +51,7 @@
   register: simple4
 
 - name: assert simple4
-  assert:
+  ansible.builtin.assert:
     that:
       - simple4.c == "abc change"
       - simple4.abc == "changed abc"
@@ -72,7 +73,7 @@
   register: simple5b
 
 - name: assert simple5
-  assert:
+  ansible.builtin.assert:
     that:
       - simple5a.a == 3
       - simple5a.b == "ohohoh"

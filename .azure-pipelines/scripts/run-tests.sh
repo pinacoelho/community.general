@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Configure the test environment and run the tests.
 
 set -o pipefail -eu
@@ -6,11 +10,13 @@ set -o pipefail -eu
 entry_point="$1"
 test="$2"
 read -r -a coverage_branches <<< "$3"  # space separated list of branches to run code coverage on for scheduled builds
+agent_temp_directory="$4"
 
 export COMMIT_MESSAGE
 export COMPLETE
 export COVERAGE
 export IS_PULL_REQUEST
+export COVERAGE_DESTINATION_DIRECTORY="${agent_temp_directory}/coverage"
 
 if [ "${SYSTEM_PULLREQUEST_TARGETBRANCH:-}" ]; then
     IS_PULL_REQUEST=true

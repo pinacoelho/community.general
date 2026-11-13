@@ -1,9 +1,12 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 ## testing values
 
 - name: "test-values 1 - set 'state=present' and 'values=[]' and 'allow_no_value=false' and fail"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: cars
     option: audi
@@ -13,7 +16,7 @@
   ignore_errors: true
 
 - name: test-values 1 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is not changed
       - result1 is failed
@@ -21,7 +24,7 @@
 
 
 - name: "test-values 2 - set 'state=present' and omit 'values' and 'allow_no_value=false' and fail"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: cars
     option: audi
@@ -30,7 +33,7 @@
   ignore_errors: true
 
 - name: test-values 2 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result2 is not changed
       - result2 is failed
@@ -38,7 +41,7 @@
 
 
 - name: "test-values 3 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in section '[drinks]' in specified file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -49,12 +52,12 @@
   register: result3
 
 - name: test-values 3 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 3 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected3: |
 
       [drinks]
@@ -63,7 +66,7 @@
     content3: "{{ output_content.content | b64decode }}"
 
 - name: test-values 3 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result3 is changed
       - result3.msg == 'section and option added'
@@ -71,7 +74,7 @@
 
 
 - name: "test-values 4 - remove option 'fav=lemonade' from section '[drinks]' in specified file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -82,12 +85,12 @@
   register: result4
 
 - name: test-values 4 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 4 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected4: |
 
       [drinks]
@@ -95,7 +98,7 @@
     content4: "{{ output_content.content | b64decode }}"
 
 - name: test-values 4 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result4 is changed
       - result4.msg == 'option changed'
@@ -103,7 +106,7 @@
 
 
 - name: "test-values 5 - add option 'fav=lemonade' in section '[drinks]' in specified file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -114,12 +117,12 @@
   register: result5
 
 - name: test-values 5 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 5 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected5: |
 
       [drinks]
@@ -128,7 +131,7 @@
     content5: "{{ output_content.content | b64decode }}"
 
 - name: test-values 5 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result5 is changed
       - result5.msg == 'option added'
@@ -136,7 +139,7 @@
 
 
 - name: "test-values 6 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -147,14 +150,14 @@
   register: result6
 
 - name: test-values 6 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result6 is not changed
       - result6.msg == 'OK'
 
 
 - name: "test-values 7 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -165,14 +168,14 @@
   register: result7
 
 - name: test-values 7 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result7 is not changed
       - result7.msg == 'OK'
 
 
 - name: "test-values 8 - add option 'fav=lemonade' in section '[drinks]' again and ensure idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -183,14 +186,14 @@
   register: result8
 
 - name: test-values 8 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result8 is not changed
       - result8.msg == 'OK'
 
 
 - name: "test-values 9 - ensure only 'fav=lemonade' is 'present' in section '[drinks]' in specified file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -200,12 +203,12 @@
   register: result9
 
 - name: test-values 9 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 9 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected9: |
 
       [drinks]
@@ -213,7 +216,7 @@
     content9: "{{ output_content.content | b64decode }}"
 
 - name: test-values 9 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result9 is changed
       - result9.msg == 'option changed'
@@ -221,7 +224,7 @@
 
 
 - name: "test-values 10 - remove non-existent 'fav=cocktail' from section '[drinks]' in specified file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -231,12 +234,12 @@
   register: result10
 
 - name: test-values 10 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 10 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected10: |
 
       [drinks]
@@ -244,7 +247,7 @@
 
 
 - name: test-values 10 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result10 is changed
       - result10.msg == 'option changed'
@@ -254,7 +257,7 @@
 - name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in section '[drinks]'"
   block:
     - name: "test-values 11 - resetting ini_fie: Ensure 'fav=lemonade' is 'present' in section '[drinks]'"
-      ini_file:
+      community.general.ini_file:
         path: "{{ output_file }}"
         section: drinks
         option: fav
@@ -262,7 +265,7 @@
           - lemonade
         state: present
     - name: "test-values 11 - Ensure 'beverage=coke' is 'present' in section '[drinks]'"
-      ini_file:
+      community.general.ini_file:
         path: "{{ output_file }}"
         section: drinks
         option: beverage
@@ -272,12 +275,12 @@
       register: result11
 
 - name: test-values 11 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 11 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected11: |
 
       [drinks]
@@ -286,7 +289,7 @@
     content11: "{{ output_content.content | b64decode }}"
 
 - name: test-values 11 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result11 is changed
       - result11.msg == 'option added'
@@ -294,7 +297,7 @@
 
 
 - name: "test-values 12 - add option 'fav=lemonade' in section '[drinks]' again and ensure idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -305,14 +308,14 @@
   register: result12
 
 - name: test-values 12 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result12 is not changed
       - result12.msg == 'OK'
 
 
 - name: "test-values 13 - add option 'fav=cocktail' in section '[drinks]' in specified file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -323,12 +326,12 @@
   register: result13
 
 - name: test-values 13 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 13 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected13: |
 
       [drinks]
@@ -338,7 +341,7 @@
     content13: "{{ output_content.content | b64decode }}"
 
 - name: test-values 13 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result13 is changed
       - result13.msg == 'option added'
@@ -346,7 +349,7 @@
 
 
 - name: "test-values 14 - Ensure 'refreshment=[water, juice, soft drink]' is 'present' in section '[drinks]'"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: refreshment
@@ -358,12 +361,12 @@
   register: result14
 
 - name: test-values 14 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 14 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected14: |
 
       [drinks]
@@ -376,7 +379,7 @@
     content14: "{{ output_content.content | b64decode }}"
 
 - name: test-values 14 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result14 is changed
       - result14.msg == 'option added'
@@ -384,7 +387,7 @@
 
 
 - name: "test-values 15 - ensure 'fav=lemonade' and 'fav=cocktail' is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -395,14 +398,14 @@
   register: result15
 
 - name: test-values 15 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result15 is not changed
       - result15.msg == 'OK'
 
 
 - name: "test-values 16 - ensure 'fav=cocktail' and 'fav=lemonade' (list reverse order) is 'present' in section '[drinks]' and check for idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -413,14 +416,14 @@
   register: result16
 
 - name: test-values 16 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result16 is not changed
       - result16.msg == 'OK'
 
 
 - name: "test-values 17 - Ensure option 'refreshment' is 'absent' in section '[drinks]'"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: refreshment
@@ -428,12 +431,12 @@
   register: result17
 
 - name: test-values 17 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 17 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected17: |
 
       [drinks]
@@ -443,15 +446,15 @@
     content17: "{{ output_content.content | b64decode }}"
 
 - name: test-values 17 - assert 'changed' is true and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result17 is changed
       - result17.msg == 'option changed'
       - content17 == expected17
 
 
-- name: "test-values 18 - Ensure 'beverage=coke' is 'abesent' in section '[drinks]'"
-  ini_file:
+- name: "test-values 18 - Ensure 'beverage=coke' is 'absent' in section '[drinks]'"
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: beverage
@@ -459,12 +462,12 @@
   register: result18
 
 - name: test-values 18 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 18 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected18: |
 
       [drinks]
@@ -473,15 +476,15 @@
     content18: "{{ output_content.content | b64decode }}"
 
 - name: test-values 18 - assert 'changed' is true and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result18 is changed
       - result18.msg == 'option changed'
       - content18 == expected18
 
 
-- name: "test-values 19 - Ensure non-existant 'beverage=coke' is 'abesent' in section '[drinks]'"
-  ini_file:
+- name: "test-values 19 - Ensure non-existent 'beverage=coke' is 'absent' in section '[drinks]'"
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: beverage
@@ -491,37 +494,37 @@
   register: result19
 
 - name: test-values 19 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result19 is not changed
       - result19.msg == 'OK'
 
 
 - name: test-values 20 - remove section 'drinks'
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     state: absent
   register: result20
 
 - name: test-values 20 - remove section 'drinks' again to ensure idempotency"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     state: absent
-  register: result20_remove_again  
+  register: result20_remove_again
 
 - name: test-values 20 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 20 - get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content20: "{{ output_content.content | b64decode }}"
 
 - name: test-values 20 - assert 'changed' is true and content is empty
-  assert:
+  ansible.builtin.assert:
     that:
       - result20 is changed
       - result20_remove_again is not changed
@@ -530,7 +533,7 @@
 
 
 - name: "test-values 21 - Ensure 'refreshment=[water, juice, soft drink, juice]' (duplicates removed) is 'present' in section '[drinks]'"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: refreshment
@@ -543,12 +546,12 @@
   register: result21
 
 - name: test-values 21 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 21 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected21: |
 
       [drinks]
@@ -558,7 +561,7 @@
     content21: "{{ output_content.content | b64decode }}"
 
 - name: test-values 21 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result21 is changed
       - result21.msg == 'section and option added'
@@ -566,9 +569,9 @@
 
 
 - name: test-values 22 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -576,8 +579,8 @@
       [section1]
       var1 = aaa
       # comment in section
-      var2 = foo
-      # var2 = bar
+      # var2 = some value
+      # comment after section
 
       [section2]
       var3 = ccc
@@ -585,7 +588,7 @@
     dest: "{{ output_file }}"
 
 - name: "test-values 22 - Ensure 'skip-name' with 'allow_no_value' is 'present' in section '[mysqld]' test allow_no_value"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: mysqld
     option: skip-name
@@ -594,14 +597,14 @@
   register: result22
 
 - name: test-values 22 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 22 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected22: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -610,8 +613,8 @@
       [section1]
       var1 = aaa
       # comment in section
-      var2 = foo
-      # var2 = bar
+      # var2 = some value
+      # comment after section
 
       [section2]
       var3 = ccc
@@ -619,34 +622,32 @@
     content22: "{{ output_content.content | b64decode }}"
 
 - name: test-values 22 - assert 'changed' is true and content is OK and option added
-  assert:
+  ansible.builtin.assert:
     that:
       - result22 is changed
       - result22.msg == 'option added'
       - content22 == expected22
 
 
-- name: "test-values 23 - Ensure 'var2=[foo, foobar]' is 'present' in section '[section1]'"
-  ini_file:
+- name: "test-values 23 - Ensure 'var2=foo' is 'present' in section '[section1]', replacing commented option 'var2=some value'"
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: section1
     option: var2
-    values: 
+    values:
       - foo
-      - foobar
     state: present
   register: result23
 
 - name: test-values 23 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 23 - set expected content and get current ini file content
-  set_fact:
-    content23: "{{ output_content.content | b64decode }}"
+  ansible.builtin.set_fact:
     expected23: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -656,42 +657,41 @@
       var1 = aaa
       # comment in section
       var2 = foo
-      var2 = foobar
-      # var2 = bar
+      # comment after section
 
       [section2]
       var3 = ccc
       # comment after section
-- name: test-values 23 - assert 'changed' and msg 'option added' and content is as expected
-  assert:
+    content23: "{{ output_content.content | b64decode }}"
+
+- name: test-values 23 - assert 'changed' and msg 'option changed' and content is as expected
+  ansible.builtin.assert:
     that:
       - result23 is changed
-      - result23.msg == 'option added'
+      - result23.msg == 'option changed'
       - content23 == expected23
 
 
-- name: "test-values 24 - Ensure 'var2=[foo, foobar, bar]' is 'present' in section '[section1]' replacing commented option 'var2=bar'"
-  ini_file:
+- name: "test-values 24 - Ensure 'var2=[foo, foobar]' is 'present' in section '[section1]'"
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: section1
     option: var2
-    values: 
+    values:
       - foo
-      - bar
       - foobar
     state: present
   register: result24
 
 - name: test-values 24 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 24 - set expected content and get current ini file content
-  set_fact:
-    content24: "{{ output_content.content | b64decode }}"
+  ansible.builtin.set_fact:
     expected24: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -702,27 +702,29 @@
       # comment in section
       var2 = foo
       var2 = foobar
-      var2 = bar
+      # comment after section
 
       [section2]
       var3 = ccc
       # comment after section
-- name: test-values 24 - assert 'added' and msg 'option changed' and content is as expected
-  assert:
+    content24: "{{ output_content.content | b64decode }}"
+
+- name: test-values 24 - assert 'changed' and msg 'option added' and content is as expected
+  ansible.builtin.assert:
     that:
       - result24 is changed
-      - result24.msg == 'option changed'
+      - result24.msg == 'option added'
       - content24 == expected24
 
 
 - name: test-values 25 - Clean test file
-  copy:
+  ansible.builtin.copy:
     content: ""
     dest: "{{ output_file }}"
-    force: yes
+    force: true
 
 - name: "test-values 25 - Ensure 'beverage=[coke, pepsi]' is created within no section"
-  ini_file:
+  community.general.ini_file:
     section:
     path: "{{ output_file }}"
     option: beverage
@@ -733,12 +735,12 @@
   register: result25
 
 - name: test-values 25 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 25 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected25: |+
       beverage = coke
       beverage = pepsi
@@ -746,7 +748,7 @@
     content25: "{{ output_content.content | b64decode }}"
 
 - name: test-values 25 - assert 'changed' is true and content is OK (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result25 is changed
       - result25.msg == 'option added'
@@ -754,7 +756,7 @@
 
 
 - name: "test-values 26 - Ensure 'beverage=coke' and 'beverage=pepsi' are modified within no section"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     option: beverage
     values:
@@ -766,20 +768,20 @@
   register: result26
 
 - name: test-values 26 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 26 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected26: |+
       beverage = water
       beverage = orange juice
-      
+
     content26: "{{ output_content.content | b64decode }}"
 
 - name: test-values 26 - assert 'changed' is true and content is OK (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result26 is changed
       - result26.msg == 'option changed'
@@ -787,7 +789,7 @@
 
 
 - name: "test-values 27 - ensure option 'beverage' is 'absent' within no section"
-  ini_file:
+  community.general.ini_file:
     section:
     path: "{{ output_file }}"
     option: beverage
@@ -795,16 +797,16 @@
   register: result27
 
 - name: test-values 27 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 27 - get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content27: "{{ output_content.content | b64decode }}"
 
 - name: test-values 27 - assert changed (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result27 is changed
       - result27.msg == 'option changed'
@@ -814,17 +816,17 @@
 - name: "test-values 28 - Ensure option 'present' without section before existing section"
   block:
     - name: test-values 28 - ensure option present within section
-      ini_file:
+      community.general.ini_file:
         path: "{{ output_file }}"
         section: drinks
         option: beverage
-        values: 
+        values:
           - water
           - orange juice
         state: present
 
     - name: test-values 28 - ensure option present without section
-      ini_file:
+      community.general.ini_file:
         path: "{{ output_file }}"
         section:
         option: like
@@ -834,12 +836,12 @@
         state: present
 
 - name: test-values 28 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-values 28 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected28: |
       like = tea
       like = coffee
@@ -850,13 +852,13 @@
     content28: "{{ output_content.content | b64decode }}"
 
 - name: test-values 28 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - content28 == expected28
 
 
 - name: test-value 29 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -866,7 +868,7 @@
     dest: "{{ output_file }}"
 
 - name: "test-value 29 - Test 'state=absent' with 'exclusive=true' with multiple options in ini_file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -876,12 +878,12 @@
   register: result29
 
 - name: test-value 29 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-value 29 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected29: |
       [drinks]
       beverage = water
@@ -889,7 +891,7 @@
     content29: "{{ output_content.content | b64decode }}"
 
 - name: test-value 29 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result29 is changed
       - result29.msg == 'option changed'
@@ -897,7 +899,7 @@
 
 
 - name: test-value 30 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -907,7 +909,7 @@
     dest: "{{ output_file }}"
 
 - name: "test-value 30 - Test 'state=absent' with 'exclusive=false' with multiple options in ini_file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -918,12 +920,12 @@
   register: result30
 
 - name: test-value 30 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-value 30 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected30: |
       [drinks]
       beverage = water
@@ -932,7 +934,7 @@
     content30: "{{ output_content.content | b64decode }}"
 
 - name: test-value 30 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result30 is changed
       - result30.msg == 'option changed'
@@ -940,7 +942,7 @@
 
 
 - name: test-value 31 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -950,7 +952,7 @@
     dest: "{{ output_file }}"
 
 - name: "test-value 31 - Test 'state=absent' with 'exclusive=true' and no value given with multiple options in ini_file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -958,12 +960,12 @@
   register: result31
 
 - name: test-value 31 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-value 31 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected31: |
       [drinks]
       beverage = water
@@ -971,7 +973,7 @@
     content31: "{{ output_content.content | b64decode }}"
 
 - name: test-value 31 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result31 is changed
       - result31.msg == 'option changed'
@@ -979,7 +981,7 @@
 
 
 - name: test-value 32 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -989,7 +991,7 @@
     dest: "{{ output_file }}"
 
 - name: "test-value 32 - Test 'state=absent' with 'exclusive=false' and no value given with multiple options in ini_file"
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: drinks
     option: fav
@@ -999,12 +1001,12 @@
   diff: true
 
 - name: test-value 32 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
 - name: test-value 32 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected32: |
       [drinks]
       fav = cocktail
@@ -1014,7 +1016,7 @@
     content32: "{{ output_content.content | b64decode }}"
 
 - name: test-value 32 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result32 is not changed
       - result32.msg == 'OK'

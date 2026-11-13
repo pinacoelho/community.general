@@ -4,30 +4,34 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Pre-test setup
 - name: create a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
     state: present
   register: vpc
 - name: create a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
-    dhcp_enable: True
+    dhcp_enable: true
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     state: present
   register: subnet
 - name: create a port
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: present
   register: port
 - name: delete a eip
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -35,9 +39,9 @@
       size: 1
     port_id: "{{ port.id }}"
     state: absent
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a eip (check mode)
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -45,15 +49,15 @@
       size: 1
     port_id: "{{ port.id }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a eip
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -63,12 +67,12 @@
     state: present
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a eip (idemponent)
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -76,15 +80,15 @@
       size: 1
     port_id: "{{ port.id }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
-  assert:
+  ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a eip that already exists
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -94,13 +98,13 @@
     state: present
   register: result
 - name: assert changed is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a eip (check mode)
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -108,15 +112,15 @@
       size: 1
     port_id: "{{ port.id }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a eip
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -126,12 +130,12 @@
     state: absent
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a eip (idemponent)
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -139,15 +143,15 @@
       size: 1
     port_id: "{{ port.id }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
-  assert:
+  ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a eip that does not exist
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -157,29 +161,29 @@
     state: absent
   register: result
 - name: assert changed is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# ---------------------------------------------------------
 # Post-test teardown
 - name: delete a port
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
   register: port
 - name: delete a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
-    dhcp_enable: True
+    dhcp_enable: true
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     state: absent
   register: subnet
 - name: delete a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
     state: absent

@@ -1,91 +1,94 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = r'''
-    name: linode
-    author:
-      - Luke Murphy (@decentral1se)
-    short_description: Ansible dynamic inventory plugin for Linode.
-    requirements:
-        - python >= 2.7
-        - linode_api4 >= 2.0.0
-    description:
-        - Reads inventories from the Linode API v4.
-        - Uses a YAML configuration file that ends with linode.(yml|yaml).
-        - Linode labels are used by default as the hostnames.
-        - The default inventory groups are built from groups (deprecated by
-          Linode) and not tags.
-    extends_documentation_fragment:
-        - constructed
-        - inventory_cache
-    options:
-        cache:
-            version_added: 4.5.0
-        cache_plugin:
-            version_added: 4.5.0
-        cache_timeout:
-            version_added: 4.5.0
-        cache_connection:
-            version_added: 4.5.0
-        cache_prefix:
-            version_added: 4.5.0
-        plugin:
-            description: Marks this as an instance of the 'linode' plugin.
-            required: true
-            choices: ['linode', 'community.general.linode']
-        ip_style:
-            description: Populate hostvars with all information available from the Linode APIv4.
-            type: string
-            default: plain
-            choices:
-                - plain
-                - api
-            version_added: 3.6.0
-        access_token:
-            description: The Linode account personal access token.
-            required: true
-            env:
-                - name: LINODE_ACCESS_TOKEN
-        regions:
-          description: Populate inventory with instances in this region.
-          default: []
-          type: list
-          elements: string
-        tags:
-          description: Populate inventory only with instances which have at least one of the tags listed here.
-          default: []
-          type: list
-          elements: string
-          version_added: 2.0.0
-        types:
-          description: Populate inventory with instances with this type.
-          default: []
-          type: list
-          elements: string
-        strict:
-          version_added: 2.0.0
-        compose:
-          version_added: 2.0.0
-        groups:
-          version_added: 2.0.0
-        keyed_groups:
-          version_added: 2.0.0
-'''
+DOCUMENTATION = r"""
+name: linode
+author:
+  - Luke Murphy (@decentral1se)
+short_description: Ansible dynamic inventory plugin for Linode
+requirements:
+  - linode_api4 >= 2.0.0
+description:
+  - Reads inventories from the Linode API v4.
+  - Uses a YAML configuration file that ends with linode.(yml|yaml).
+  - Linode labels are used by default as the hostnames.
+  - The default inventory groups are built from groups (deprecated by Linode) and not tags.
+extends_documentation_fragment:
+  - ansible.builtin.constructed
+  - ansible.builtin.inventory_cache
+options:
+  cache:
+    version_added: 4.5.0
+  cache_plugin:
+    version_added: 4.5.0
+  cache_timeout:
+    version_added: 4.5.0
+  cache_connection:
+    version_added: 4.5.0
+  cache_prefix:
+    version_added: 4.5.0
+  plugin:
+    description: Marks this as an instance of the 'linode' plugin.
+    type: string
+    required: true
+    choices: ['linode', 'community.general.linode']
+  ip_style:
+    description: Populate hostvars with all information available from the Linode APIv4.
+    type: string
+    default: plain
+    choices:
+      - plain
+      - api
+    version_added: 3.6.0
+  access_token:
+    description: The Linode account personal access token.
+    type: string
+    required: true
+    env:
+      - name: LINODE_ACCESS_TOKEN
+    secret: true
+  regions:
+    description: Populate inventory with instances in this region.
+    default: []
+    type: list
+    elements: string
+  tags:
+    description: Populate inventory only with instances which have at least one of the tags listed here.
+    default: []
+    type: list
+    elements: string
+    version_added: 2.0.0
+  types:
+    description: Populate inventory with instances with this type.
+    default: []
+    type: list
+    elements: string
+  strict:
+    version_added: 2.0.0
+  compose:
+    version_added: 2.0.0
+  groups:
+    version_added: 2.0.0
+  keyed_groups:
+    version_added: 2.0.0
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
+---
 # Minimal example. `LINODE_ACCESS_TOKEN` is exposed in environment.
 plugin: community.general.linode
 
+---
 # You can use Jinja to template the access token.
 plugin: community.general.linode
 access_token: "{{ lookup('ini', 'token', section='your_username', file='~/.config/linode-cli') }}"
 # For older Ansible versions, you need to write this as:
 # access_token: "{{ lookup('ini', 'token section=your_username file=~/.config/linode-cli') }}"
 
+---
 # Example with regions, types, groups and access token
 plugin: community.general.linode
 access_token: foobar
@@ -94,6 +97,7 @@ regions:
 types:
   - g5-standard-2
 
+---
 # Example with keyed_groups, groups, and compose
 plugin: community.general.linode
 access_token: foobar
@@ -112,55 +116,42 @@ compose:
   ansible_ssh_host: ipv4[0]
   ansible_port: 2222
 
+---
 # Example where control traffic limited to internal network
 plugin: community.general.linode
 access_token: foobar
 ip_style: api
 compose:
   ansible_host: "ipv4 | community.general.json_query('[?public==`false`].address') | first"
-'''
+"""
 
-import os
+from ansible.errors import AnsibleError
+from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 
-from ansible.errors import AnsibleError, AnsibleParserError
-from ansible.module_utils.six import string_types
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.template import Templar
-
+from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
 
 try:
     from linode_api4 import LinodeClient
-    from linode_api4.objects.linode import Instance
     from linode_api4.errors import ApiError as LinodeApiError
+    from linode_api4.objects.linode import Instance
+
     HAS_LINODE = True
 except ImportError:
     HAS_LINODE = False
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-
-    NAME = 'community.general.linode'
+    NAME = "community.general.linode"
 
     def _build_client(self, loader):
         """Build the Linode client."""
 
-        t = Templar(loader=loader)
-
-        access_token = self.get_option('access_token')
-        if t.is_template(access_token):
-            access_token = t.template(variable=access_token, disable_lookups=False)
+        access_token = self.get_option("access_token")
+        if self.templar.is_template(access_token):
+            access_token = self.templar.template(variable=access_token)
 
         if access_token is None:
-            try:
-                access_token = os.environ['LINODE_ACCESS_TOKEN']
-            except KeyError:
-                pass
-
-        if access_token is None:
-            raise AnsibleError((
-                'Could not retrieve Linode access token '
-                'from plugin configuration or environment'
-            ))
+            raise AnsibleError("Could not retrieve Linode access token from plugin configuration sources")
 
         self.client = LinodeClient(access_token)
 
@@ -169,72 +160,52 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         try:
             self.instances = self.client.linode.instances()
         except LinodeApiError as exception:
-            raise AnsibleError('Linode client raised: %s' % exception)
+            raise AnsibleError(f"Linode client raised: {exception}") from exception
 
     def _add_groups(self):
         """Add Linode instance groups to the dynamic inventory."""
-        self.linode_groups = set(
-            filter(None, [
-                instance.group
-                for instance
-                in self.instances
-            ])
-        )
+        self.linode_groups = {instance.group for instance in self.instances if instance.group}
 
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
 
     def _filter_by_config(self):
         """Filter instances by user specified configuration."""
-        regions = self.get_option('regions')
+        regions = self.get_option("regions")
         if regions:
-            self.instances = [
-                instance for instance in self.instances
-                if instance.region.id in regions
-            ]
+            self.instances = [instance for instance in self.instances if instance.region.id in regions]
 
-        types = self.get_option('types')
+        types = self.get_option("types")
         if types:
-            self.instances = [
-                instance for instance in self.instances
-                if instance.type.id in types
-            ]
+            self.instances = [instance for instance in self.instances if instance.type.id in types]
 
-        tags = self.get_option('tags')
+        tags = self.get_option("tags")
         if tags:
-            self.instances = [
-                instance for instance in self.instances
-                if any(tag in instance.tags for tag in tags)
-            ]
+            self.instances = [instance for instance in self.instances if any(tag in instance.tags for tag in tags)]
 
     def _add_instances_to_groups(self):
         """Add instance names to their dynamic inventory groups."""
         for instance in self.instances:
-            self.inventory.add_host(instance.label, group=instance.group)
+            self.inventory.add_host(make_unsafe(instance.label), group=instance.group)
 
     def _add_hostvars_for_instances(self):
         """Add hostvars for instances in the dynamic inventory."""
-        ip_style = self.get_option('ip_style')
+        ip_style = self.get_option("ip_style")
         for instance in self.instances:
             hostvars = instance._raw_json
+            hostname = make_unsafe(instance.label)
             for hostvar_key in hostvars:
-                if ip_style == 'api' and hostvar_key in ['ipv4', 'ipv6']:
+                if ip_style == "api" and hostvar_key in ["ipv4", "ipv6"]:
                     continue
-                self.inventory.set_variable(
-                    instance.label,
-                    hostvar_key,
-                    hostvars[hostvar_key]
-                )
-            if ip_style == 'api':
+                self.inventory.set_variable(hostname, hostvar_key, make_unsafe(hostvars[hostvar_key]))
+            if ip_style == "api":
                 ips = instance.ips.ipv4.public + instance.ips.ipv4.private
                 ips += [instance.ips.ipv6.slaac, instance.ips.ipv6.link_local]
                 ips += instance.ips.ipv6.pools
 
-                for ip_type in set(ip.type for ip in ips):
+                for ip_type in {ip.type for ip in ips}:
                     self.inventory.set_variable(
-                        instance.label,
-                        ip_type,
-                        self._ip_data([ip for ip in ips if ip.type == ip_type])
+                        hostname, ip_type, make_unsafe(self._ip_data([ip for ip in ips if ip.type == ip_type]))
                     )
 
     def _ip_data(self, ip_list):
@@ -242,13 +213,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for ip in list(ip_list):
             data.append(
                 {
-                    'address': ip.address,
-                    'subnet_mask': ip.subnet_mask,
-                    'gateway': ip.gateway,
-                    'public': ip.public,
-                    'prefix': ip.prefix,
-                    'rdns': ip.rdns,
-                    'type': ip.type
+                    "address": ip.address,
+                    "subnet_mask": ip.subnet_mask,
+                    "gateway": ip.gateway,
+                    "public": ip.public,
+                    "prefix": ip.prefix,
+                    "rdns": ip.rdns,
+                    "type": ip.type,
                 }
             )
         return data
@@ -257,7 +228,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return [i._raw_json for i in self.instances]
 
     def populate(self):
-        strict = self.get_option('strict')
+        strict = self.get_option("strict")
 
         self._filter_by_config()
 
@@ -265,45 +236,47 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._add_instances_to_groups()
         self._add_hostvars_for_instances()
         for instance in self.instances:
-            variables = self.inventory.get_host(instance.label).get_vars()
-            self._add_host_to_composed_groups(
-                self.get_option('groups'),
-                variables,
-                instance.label,
-                strict=strict)
-            self._add_host_to_keyed_groups(
-                self.get_option('keyed_groups'),
-                variables,
-                instance.label,
-                strict=strict)
-            self._set_composite_vars(
-                self.get_option('compose'),
-                variables,
-                instance.label,
-                strict=strict)
+            hostname = make_unsafe(instance.label)
+            variables = self.inventory.get_host(hostname).get_vars()
+            self._add_host_to_composed_groups(self.get_option("groups"), variables, hostname, strict=strict)
+            self._add_host_to_keyed_groups(self.get_option("keyed_groups"), variables, hostname, strict=strict)
+            self._set_composite_vars(self.get_option("compose"), variables, hostname, strict=strict)
 
     def verify_file(self, path):
-        """Verify the Linode configuration file."""
-        if super(InventoryModule, self).verify_file(path):
-            endings = ('linode.yaml', 'linode.yml')
-            if any((path.endswith(ending) for ending in endings)):
-                return True
-        return False
+        """Verify the Linode configuration file.
+
+        Return true/false if the config-file is valid for this plugin
+
+        Args:
+            str(path): path to the config
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            bool(valid): is valid config file"""
+        valid = False
+        if super().verify_file(path):
+            if path.endswith(("linode.yaml", "linode.yml")):
+                valid = True
+            else:
+                self.display.vvv('Inventory source not ending in "linode.yaml" or "linode.yml"')
+        return valid
 
     def parse(self, inventory, loader, path, cache=True):
         """Dynamically parse Linode the cloud inventory."""
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
         self.instances = None
 
         if not HAS_LINODE:
-            raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
+            raise AnsibleError("the Linode dynamic inventory plugin requires linode_api4.")
 
         self._read_config_data(path)
 
         cache_key = self.get_cache_key(path)
 
         if cache:
-            cache = self.get_option('cache')
+            cache = self.get_option("cache")
 
         update_cache = False
         if cache:

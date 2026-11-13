@@ -1,43 +1,48 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # TODO: Our current implementation does not handle SMTP authentication
 
-# NOTE: If the system does not support smtpd-tls (python 2.6 and older) we do basic tests
-- name: Attempt to install smtpd-tls
-  pip:
-    name: smtpd-tls
-    state: present
-  ignore_errors: yes
-  register: smtpd_tls
-
 - name: Install test smtpserver
-  copy:
+  ansible.builtin.copy:
     src: '{{ item }}'
     dest: '{{ remote_tmp_dir }}/{{ item }}'
   loop:
-  - smtpserver.py
-  - smtpserver.crt
-  - smtpserver.key
+    - smtpserver.py
+    - smtpserver.crt
+    - smtpserver.key
 
 # FIXME: Verify the mail after it was send would be nice
 #        This would require either dumping the content, or registering async task output
 - name: Start test smtpserver
-  shell: '{{ ansible_python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
+  ansible.builtin.command: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
   async: 45
   poll: 0
   register: smtpserver
 
+- name: Wait for test smtpserver
+  ansible.builtin.wait_for:
+    port: '{{ item }}'
+    timeout: 10
+  loop:
+    - 10025
+    - 10465
+
 - name: Send a basic test-mail
-  mail:
+  community.general.mail:
     port: 10025
     subject: Test mail 1 (smtp)
     secure: never
 
 - name: Send a test-mail with body and specific recipient
-  mail:
+  community.general.mail:
     port: 10025
     from: ansible@localhost
     to: root@localhost
@@ -46,7 +51,7 @@
     secure: never
 
 - name: Send a test-mail with attachment
-  mail:
+  community.general.mail:
     port: 10025
     from: ansible@localhost
     to: root@localhost
@@ -55,9 +60,8 @@
     attach: /etc/group
     secure: never
 
-# NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
 - name: Send a test-mail using starttls
-  mail:
+  community.general.mail:
     port: 10025
     from: ansible@localhost
     to: root@localhost
@@ -65,12 +69,9 @@
     body: Test body 4
     attach: /etc/group
     secure: starttls
-  ignore_errors: yes
-  register: starttls_support
 
-# NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
 - name: Send a test-mail using TLS
-  mail:
+  community.general.mail:
     port: 10465
     from: ansible@localhost
     to: root@localhost
@@ -78,19 +79,9 @@
     body: Test body 5
     attach: /etc/group
     secure: always
-  ignore_errors: yes
-  register: tls_support
-
-- fail:
-    msg: Sending mail using starttls failed.
-  when: smtpd_tls is succeeded and starttls_support is failed and tls_support is succeeded
-
-- fail:
-    msg: Send mail using TLS failed.
-  when: smtpd_tls is succeeded and tls_support is failed and starttls_support is succeeded
 
 - name: Send a test-mail with body, specific recipient and specific ehlohost
-  mail:
+  community.general.mail:
     port: 10025
     ehlohost: some.domain.tld
     from: ansible@localhost
@@ -98,3 +89,31 @@
     subject: Test mail 6 (smtp + body + ehlohost)
     body: Test body 6
     secure: never
+
+- name: Send a test-mail to a port with no listener
+  community.general.mail:
+    port: 10026
+    subject: Test mail 7 (connection refused)
+    secure: never
+  ignore_errors: true
+  register: connection_refused
+
+- name: Assert connection error is reported as a module failure
+  ansible.builtin.assert:
+    that:
+      - connection_refused is failed
+      - connection_refused.msg is search('Unable to Connect')
+
+- name: Send a test-mail with secure=always to a port with no listener
+  community.general.mail:
+    port: 10027
+    subject: Test mail 8 (tls required, connection refused)
+    secure: always
+  ignore_errors: true
+  register: tls_required_refused
+
+- name: Assert no unencrypted connection is attempted with secure=always
+  ansible.builtin.assert:
+    that:
+      - tls_required_refused is failed
+      - tls_required_refused.msg is search('Unable to start an encrypted session')

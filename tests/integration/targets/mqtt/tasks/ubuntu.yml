@@ -1,22 +1,27 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Install pip packages
-  pip:
+  ansible.builtin.pip:
     name: paho-mqtt>=1.4.0
     state: present
 
 - name: MQTT non-TLS endpoint
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo
     qos: 1
     client_id: me001
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
 - name: Send a test message to TLS1.1 endpoint, no client version specified
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -27,12 +32,12 @@
     port: 8883
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
 - name: Send a test message to TLS1.2 endpoint, no client version specified
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -43,14 +48,14 @@
     port: 8884
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
 # TODO(Uncomment when TLS1.3 is supported in moquitto and ubuntu version)
 #
 # - name: Send a test message to TLS1.3 endpoint
-#  mqtt:
+#  community.general.mqtt:
 #    topic: /node/s/bar/blurb
 #    payload: foo-tls
 #    qos: 1
@@ -61,12 +66,12 @@
 #    port: 8885
 #  register: result
 
-#- assert:
-#    that:
-#      - result is success
+# - ansible.builtin.assert:
+#     that:
+#       - result is success
 
 - name: Send a message, client TLS1.1, server (required) TLS1.2 - Expected failure
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -79,14 +84,14 @@
   register: result
   failed_when: result is success
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
 # TODO(Uncomment when TLS1.3 is supported in moquitto and ubuntu version)
 #
 # - name: Send a message, client TLS1.1, server (required) TLS1.3 - Expected failure
-#  mqtt:
+#  community.general.mqtt:
 #    topic: /node/s/bar/blurb
 #    payload: foo-tls
 #    qos: 1
@@ -99,12 +104,12 @@
 #  register: result
 #  failed_when: result is success
 
-# - assert:
+# - ansible.builtin.assert:
 #    that:
 #      - result is success
 
 - name: Send a message, client TLS1.2, server (required) TLS1.1 - Expected failure
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -117,14 +122,14 @@
   register: result
   failed_when: result is success
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
 # TODO(Uncomment when TLS1.3 is supported in moquitto and ubuntu version)
 #
 # - name: Send a message, client TLS1.2, server (required) TLS1.3 - Expected failure
-#  mqtt:
+#  community.general.mqtt:
 #    topic: /node/s/bar/blurb
 #    payload: foo-tls
 #    qos: 1
@@ -137,6 +142,6 @@
 #  register: result
 #  failed_when: result is success
 
-# - assert:
+# - ansible.builtin.assert:
 #    that:
 #      - result is success

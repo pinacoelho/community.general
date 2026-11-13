@@ -1,9 +1,12 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Regression test for https://github.com/ansible-collections/community.general/pull/2578#issuecomment-868092282
 - name: Create UTF-8 test file
-  copy:
-    content: !!binary |
+  community.general.write_binary_file:
+    content: |
       W2FwcDptYWluXQphdmFpbGFibGVfbGFuZ3VhZ2VzID0gZW4gZnIgZXMgZGUgcHQgamEgbHQgemhf
       VFcgaWQgZGEgcHRfQlIgcnUgc2wgaXQgbmxfTkwgdWsgdGEgc2kgY3MgbmIgaHUKIyBGdWxsIGxh
       bmd1YWdlIG5hbWVzIGluIG5hdGl2ZSBsYW5ndWFnZSAoY29tbWEgc2VwYXJhdGVkKQphdmFpbGFi
@@ -14,7 +17,7 @@
       jSwg4LeD4LeS4LaC4LeE4La9LCDEjGVza3ksIEJva23DpWwsIE1hZ3lhcgo=
     dest: '{{ output_file }}'
 - name: Add entries
-  ini_file:
+  community.general.ini_file:
     section: "{{ item.section }}"
     option: "{{ item.option }}"
     value: "{{ item.value }}"

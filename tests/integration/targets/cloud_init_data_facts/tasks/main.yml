@@ -4,55 +4,79 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Help debugging
+  ansible.builtin.debug:
+    msg: >-
+      distribution={{ ansible_facts.distribution }},
+      distribution major version={{ ansible_facts.distribution_major_version }},
+      os_family={{ ansible_facts.os_family }},
+      Python version={{ ansible_facts.python.version.major }}
+
 - name: test cloud-init
   # TODO: check for a workaround
   # install 'cloud-init'' failed: dpkg-divert: error: `diversion of /etc/init/ureadahead.conf
   # to /etc/init/ureadahead.conf.disabled by cloud-init' clashes with `local diversion of
   # /etc/init/ureadahead.conf to /etc/init/ureadahead.conf.distrib
   # https://bugs.launchpad.net/ubuntu/+source/ureadahead/+bug/997838
-  # Will also have to skip on OpenSUSE when running on Python 2 on newer Leap versions
-  # (!= 42 and >= 15) ascloud-init will install the Python 3 package, breaking our build on py2.
   when:
-  - not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int == 14)
-  - not (ansible_os_family == "Suse" and ansible_distribution_major_version|int != 42 and ansible_python.version.major != 3)
-  - not (ansible_distribution == "CentOS" and ansible_distribution_major_version|int == 8)  # TODO: cannot start service
-  - not (ansible_distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
-  - not (ansible_distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
+    - not (ansible_facts.os_family == "Suse")
   block:
-  - name: setup install cloud-init
-    package:
-      name:
-      - cloud-init
-      - udev
+    - name: setup install cloud-init (Arch Linux)
+      community.general.pacman:
+        name:
+          - cloud-init
+          - udev
+        extra_args: "--overwrite '*'"
+      when: ansible_facts.distribution == 'Archlinux'
 
-  - name: setup run cloud-init
-    service:
-      name: cloud-init-local
-      state: restarted
+    - name: setup install cloud-init
+      ansible.builtin.package:
+        name:
+          - cloud-init
+          - udev
 
-  - name: test gather cloud-init facts in check mode
-    cloud_init_data_facts:
-    check_mode: yes
-    register: result
-  - name: verify test gather cloud-init facts in check mode
-    assert:
-      that:
-        - result.cloud_init_data_facts.status.v1 is defined
-        - result.cloud_init_data_facts.status.v1.stage is defined
-        - not result.cloud_init_data_facts.status.v1.stage
-        - cloud_init_data_facts.status.v1 is defined
-        - cloud_init_data_facts.status.v1.stage is defined
-        - not cloud_init_data_facts.status.v1.stage
+    - name: Ensure systemd-network user exists
+      ansible.builtin.user:
+        name: systemd-network
+        state: present
+      when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 37
 
-  - name: test gather cloud-init facts
-    cloud_init_data_facts:
-    register: result
-  - name: verify test gather cloud-init facts
-    assert:
-      that:
-        - result.cloud_init_data_facts.status.v1 is defined
-        - result.cloud_init_data_facts.status.v1.stage is defined
-        - not result.cloud_init_data_facts.status.v1.stage
-        - cloud_init_data_facts.status.v1 is defined
-        - cloud_init_data_facts.status.v1.stage is defined
-        - not cloud_init_data_facts.status.v1.stage
+    - name: setup cloud-init to not probe the cloud platform the tests are running on
+      ansible.builtin.copy:
+        dest: /etc/cloud/cloud.cfg.d/99_ansible_test.cfg
+        content: |
+          datasource_list: [None]
+
+    - name: setup run cloud-init
+      ansible.builtin.command: cloud-init init --local
+
+    - name: test gather cloud-init facts in check mode
+      community.general.cloud_init_data_facts:
+      check_mode: true
+      register: result
+    - name: verify test gather cloud-init facts in check mode
+      ansible.builtin.assert:
+        that:
+          - result.cloud_init_data_facts.status.v1 is defined
+          - result.cloud_init_data_facts.status.v1.stage is defined
+          - not result.cloud_init_data_facts.status.v1.stage
+          - cloud_init_data_facts.status.v1 is defined
+          - cloud_init_data_facts.status.v1.stage is defined
+          - not cloud_init_data_facts.status.v1.stage
+
+    - name: test gather cloud-init facts
+      community.general.cloud_init_data_facts:
+      register: result
+    - name: verify test gather cloud-init facts
+      ansible.builtin.assert:
+        that:
+          - result.cloud_init_data_facts.status.v1 is defined
+          - result.cloud_init_data_facts.status.v1.stage is defined
+          - not result.cloud_init_data_facts.status.v1.stage
+          - cloud_init_data_facts.status.v1 is defined
+          - cloud_init_data_facts.status.v1.stage is defined
+          - not cloud_init_data_facts.status.v1.stage

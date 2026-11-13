@@ -1,16 +1,25 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 namespace: community
 name: general
-version: 5.1.0
+version: 14.1.0
 readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
-description: null
+description: >-
+  The community.general collection is a part of the Ansible package and includes many modules and
+  plugins supported by Ansible community which are not part of more specialized community collections.
 license_file: COPYING
-tags: [community]
-# NOTE: No dependencies are expected to be added here
-# dependencies:
+tags:
+  - community
+dependencies:
+  community.library_inventory_filtering_v1: '>=1.0.0'
 repository: https://github.com/ansible-collections/community.general
-documentation: https://docs.ansible.com/ansible/latest/collections/community/general/
+documentation: https://docs.ansible.com/projects/ansible/latest/collections/community/general/
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
-#type: flatmap
+build_ignore:
+  - .nox

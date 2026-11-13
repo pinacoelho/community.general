@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
-# (c) 2020, Adam Migus <adam@migus.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Adam Migus <adam@migus.org>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# Make coding more python3-ish
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
-
-from ansible_collections.community.general.tests.unit.compat.unittest import TestCase
-from ansible_collections.community.general.tests.unit.compat.mock import (
-    patch,
+from unittest import TestCase
+from unittest.mock import (
     MagicMock,
+    patch,
 )
-from ansible_collections.community.general.plugins.lookup import dsv
+
 from ansible.plugins.loader import lookup_loader
+
+from ansible_collections.community.general.plugins.lookup import dsv
 
 
 class MockSecretsVault(MagicMock):
@@ -38,6 +37,10 @@ class TestLookupModule(TestCase):
             self.lookup.run(
                 ["/dummy"],
                 [],
-                **{"tenant": "dummy", "client_id": "dummy", "client_secret": "dummy", }
+                **{
+                    "tenant": "dummy",
+                    "client_id": "dummy",
+                    "client_secret": "dummy",
+                },
             ),
         )

@@ -1,93 +1,93 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- block:
-  - name: Install EPEL repository (RHEL only)
-    include_role:
-      name: setup_epel
-    when:
-      - ansible_distribution in ['RedHat', 'CentOS']
-      - ansible_distribution_major_version is version('9', '<')
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-  - name: create required directories
-    become: yes
-    file:
-      path: "{{ item }}"
-      state: directory
-    loop:
-      - /var/lib/monit
-      - /var/run/monit
-      - "{{ process_root }}"
+- when:
+    - ansible_facts.os_family != 'Suse'
+  block:
+    - name: Install EPEL repository (only effective in RHEL)
+      ansible.builtin.include_role:
+        name: setup_epel
 
-  - name: install monit
-    become: yes
-    package:
-      name: monit
-      state: present
+    - name: create required directories
+      become: true
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /var/lib/monit
+        - /var/run/monit
+        - "{{ process_root }}"
 
-  - include_vars: '{{ item }}'
-    with_first_found:
-      - files:
-          - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
-          - '{{ ansible_os_family }}.yml'
-          - 'defaults.yml'
+    - name: install monit
+      become: true
+      ansible.builtin.package:
+        name: monit
+        state: present
 
-  - name: monit config
-    become: yes
-    template:
-      src: "monitrc.j2"
-      dest: "{{ monitrc }}"
+    - ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+            - '{{ ansible_facts.os_family }}.yml'
+            - 'defaults.yml'
 
-  - name: copy process file
-    become: yes
-    copy:
-      src: httpd_echo.py
-      dest: "{{ process_file }}"
+    - name: monit config
+      become: true
+      ansible.builtin.template:
+        src: "monitrc.j2"
+        dest: "{{ monitrc }}"
 
-  - name: Install virtualenv
-    package:
-      name: virtualenv
-      state: present
-    when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+    - name: copy process file
+      become: true
+      ansible.builtin.copy:
+        src: httpd_echo.py
+        dest: "{{ process_file }}"
 
-  - name: Install virtualenv
-    package:
-      name: python-virtualenv
-      state: present
-    when: ansible_os_family == 'Archlinux'
+    - name: Install virtualenv on Arch Linux
+      ansible.builtin.pip:
+        name: virtualenv
+        state: present
+      when: ansible_facts.os_family == 'Archlinux'
 
-  - name: install dependencies
-    pip:
-      name: "{{ item }}"
-      virtualenv: "{{ process_venv }}"
-    loop:
-      - setuptools==44
-      - python-daemon
+    - name: install dependencies
+      ansible.builtin.pip:
+        name: "{{ item }}"
+        virtualenv: "{{ process_venv }}"
+        virtualenv_command: "{{ virtualenv_command }}"
+        extra_args: "-c {{ remote_constraints }}"
+      loop:
+        - setuptools
+        - python-daemon
 
-  - name: restart monit
-    become: yes
-    service:
-      name: monit
-      state: restarted
+    - name: restart monit
+      become: true
+      ansible.builtin.service:
+        name: monit
+        state: restarted
 
-  - include_tasks: test.yml
+    - ansible.builtin.include_tasks: test.yml
 
   always:
-  - name: stop monit
-    become: yes
-    service:
-      name: monit
-      state: stopped
+    - name: stop monit
+      become: true
+      ansible.builtin.service:
+        name: monit
+        state: stopped
 
-  - name: uninstall monit
-    become: yes
-    package:
-      name: monit
-      state: absent
+    - name: uninstall monit
+      become: true
+      ansible.builtin.package:
+        name: monit
+        state: absent
 
-  - name: remove process files
-    file:
-      path: "{{ process_root }}"
-      state: absent
+    - name: remove process files
+      ansible.builtin.file:
+        path: "{{ process_root }}"
+        state: absent

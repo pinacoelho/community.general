@@ -1,23 +1,28 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Install required libs
-  pip:
+  ansible.builtin.pip:
     name: python-gitlab
     state: present
 
 - name: Create {{ gitlab_project_name }}
-  gitlab_project:
+  community.general.gitlab_project:
     server_url: "{{ gitlab_host }}"
-    validate_certs: False
+    validate_certs: false
     login_token: "{{ gitlab_login_token }}"
     name: "{{ gitlab_project_name }}"
     state: present
 
 - name: Cleanup GitLab hook
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -26,7 +31,7 @@
     state: absent
 
 - name: Create GitLab Hook
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -36,13 +41,13 @@
   register: gitlab_hook_state
 
 - name: Test group created
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_hook_state is changed
 
 
 - name: Create GitLab Hook ( Idempotency test )
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -52,12 +57,12 @@
   register: gitlab_hook_state_again
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_hook_state_again is not changed
 
 - name: Remove GitLab hook
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -67,6 +72,6 @@
   register: gitlab_hook_state_absent
 
 - name: Assert hook has been removed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_hook_state_absent is changed

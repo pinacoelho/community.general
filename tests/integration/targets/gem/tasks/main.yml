@@ -1,225 +1,264 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
 # test code for the gem module
-# (c) 2014, James Tanner <tanner.jc@gmail.com>
+# Copyright (c) 2014, James Tanner <tanner.jc@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+- ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+        - 'default.yml'
+      paths: '../vars'
 
-- when:
-    - not (ansible_os_family == 'Alpine')  # TODO
+- name: Install dependencies for test
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ test_packages }}"
+  when: ansible_facts.distribution != "MacOSX"
+
+# default user_install: skip on RedHat/Fedora where OS-injected --install-dir conflicts
+- when: ansible_facts.os_family != "RedHat"
   block:
-
-  - include_vars: '{{ item }}'
-    with_first_found:
-      - files:
-          - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-          - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-          - '{{ ansible_os_family }}.yml'
-          - 'default.yml'
-        paths: '../vars'
-
-  - name: Install dependencies for test
-    package:
-      name: "{{ item }}"
-      state: present
-    loop: "{{ test_packages }}"
-    when: ansible_distribution != "MacOSX"
-
-  - name: Install a gem
-    gem:
-      name: gist
-      state: present
-    register: install_gem_result
-    ignore_errors: yes
-
-  # when running as root on Fedora, '--install-dir' is set in the os defaults which is
-  # incompatible with '--user-install', we ignore this error for this case only
-  - name: fail if failed to install gem
-    fail:
-      msg: "failed to install gem: {{ install_gem_result.msg }}"
-    when:
-    - install_gem_result is failed
-    - not (ansible_user_uid == 0 and "User --install-dir or --user-install but not both" not in install_gem_result.msg)
-
-  - block:
-    - name: List gems
-      command: gem list
-      register: current_gems
-
-    - name: Ensure gem was installed
-      assert:
-        that:
-          - install_gem_result is changed
-          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
-
-    - name: Remove a gem
-      gem:
-        name: gist
-        state: absent
-      register: remove_gem_results
-
-    - name: List gems
-      command: gem list
-      register: current_gems
-
-    - name: Verify gem is not installed
-      assert:
-        that:
-          - remove_gem_results is changed
-          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
-    when: not install_gem_result is failed
-
-  # install gem in --no-user-install
-  - block:
-    - name: Install a gem with --no-user-install
-      gem:
+    - name: Install a gem (default user_install)
+      community.general.gem:
         name: gist
         state: present
-        user_install: no
       register: install_gem_result
 
     - name: List gems
-      command: gem list
+      ansible.builtin.command: gem list
       register: current_gems
 
     - name: Ensure gem was installed
-      assert:
+      ansible.builtin.assert:
         that:
           - install_gem_result is changed
           - current_gems.stdout is search('gist\s+\([0-9.]+\)')
 
     - name: Remove a gem
-      gem:
+      community.general.gem:
         name: gist
         state: absent
       register: remove_gem_results
 
     - name: List gems
-      command: gem list
+      ansible.builtin.command: gem list
       register: current_gems
 
     - name: Verify gem is not installed
-      assert:
+      ansible.builtin.assert:
         that:
           - remove_gem_results is changed
           - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
-    when: ansible_user_uid == 0
 
-  # Check cutom gem directory
-  - name: Install gem in a custom directory with incorrect options
-    gem:
-      name: gist
-      state: present
-      install_dir: "{{ remote_tmp_dir }}/gems"
-    ignore_errors: yes
-    register: install_gem_fail_result
+# install gem in --no-user-install
+- block:
+    - name: Install a gem with --no-user-install
+      community.general.gem:
+        name: gist
+        state: present
+        user_install: false
+      register: install_gem_result
 
-  - debug:
-      var: install_gem_fail_result
-    tags: debug
+    - name: List gems
+      ansible.builtin.command: gem list
+      register: current_gems
 
-  - name: Ensure previous task failed
-    assert:
-      that:
-        - install_gem_fail_result is failed
-        - install_gem_fail_result.msg == 'install_dir requires user_install=false'
+    - name: Ensure gem was installed
+      ansible.builtin.assert:
+        that:
+          - install_gem_result is changed
+          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
 
-  - name: Install a gem in a custom directory
-    gem:
-      name: gist
-      state: present
-      user_install: no
-      install_dir: "{{ remote_tmp_dir }}/gems"
-    register: install_gem_result
+    - name: Remove a gem
+      community.general.gem:
+        name: gist
+        state: absent
+        user_install: false
+      register: remove_gem_results
 
-  - name: Find gems in custom directory
-    find:
-      paths: "{{ remote_tmp_dir }}/gems/gems"
-      file_type: directory
-      contains: gist
-    register: gem_search
+    - name: List gems
+      ansible.builtin.command: gem list
+      register: current_gems
 
-  - name: Ensure gem was installed in custom directory
-    assert:
-      that:
-        - install_gem_result is changed
-        - gem_search.files[0].path is search('gist-[0-9.]+')
-    ignore_errors: yes
+    - name: Verify gem is not installed
+      ansible.builtin.assert:
+        that:
+          - remove_gem_results is changed
+          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+  when: ansible_facts.user_uid == 0
 
-  - name: Remove a gem in a custom directory
-    gem:
-      name: gist
-      state: absent
-      user_install: no
-      install_dir: "{{ remote_tmp_dir }}/gems"
-    register: install_gem_result
+# Check custom gem directory
+- name: Install gem in a custom directory with incorrect options
+  community.general.gem:
+    name: gist
+    state: present
+    install_dir: "{{ remote_tmp_dir }}/gems"
+  ignore_errors: true
+  register: install_gem_fail_result
 
-  - name: Find gems in custom directory
-    find:
-      paths: "{{ remote_tmp_dir }}/gems/gems"
-      file_type: directory
-      contains: gist
-    register: gem_search
+- ansible.builtin.debug:
+    var: install_gem_fail_result
+  tags: debug
 
-  - name: Ensure gem was removed in custom directory
-    assert:
-      that:
-        - install_gem_result is changed
-        - gem_search.files | length == 0
+- name: Ensure previous task failed
+  ansible.builtin.assert:
+    that:
+      - install_gem_fail_result is failed
+      - install_gem_fail_result.msg == 'install_dir requires user_install=false'
 
-  # Custom directory for executables (--bindir)
-  - name: Install gem with custom bindir
-    gem:
-      name: gist
-      state: present
-      bindir: "{{ remote_tmp_dir }}/custom_bindir"
-      norc: yes
-      user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
-    register: install_gem_result
+- name: Install a gem in a custom directory
+  community.general.gem:
+    name: gist
+    state: present
+    user_install: false
+    install_dir: "{{ remote_tmp_dir }}/gems"
+  register: install_gem_result
 
-  - name: Get stats of gem executable
-    stat:
-      path: "{{ remote_tmp_dir }}/custom_bindir/gist"
-    register: gem_bindir_stat
+- name: Find gems in custom directory
+  ansible.builtin.find:
+    paths: "{{ remote_tmp_dir }}/gems/gems"
+    file_type: directory
+    contains: gist
+  register: gem_search
 
-  - name: Ensure gem executable was installed in custom directory
-    assert:
-      that:
-        - install_gem_result is changed
-        - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
+- name: Ensure gem was installed in custom directory
+  ansible.builtin.assert:
+    that:
+      - install_gem_result is changed
+      - gem_search.files[0].path is search('gist-[0-9.]+')
+  ignore_errors: true
 
-  - name: Remove gem with custom bindir
-    gem:
-      name: gist
-      state: absent
-      bindir: "{{ remote_tmp_dir }}/custom_bindir"
-      norc: yes
-      user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
-    register: install_gem_result
+- name: Remove a gem in a custom directory
+  community.general.gem:
+    name: gist
+    state: absent
+    user_install: false
+    install_dir: "{{ remote_tmp_dir }}/gems"
+  register: install_gem_result
 
-  - name: Get stats of gem executable
-    stat:
-      path: "{{ remote_tmp_dir }}/custom_bindir/gist"
-    register: gem_bindir_stat
+- name: Find gems in custom directory
+  ansible.builtin.find:
+    paths: "{{ remote_tmp_dir }}/gems/gems"
+    file_type: directory
+    contains: gist
+  register: gem_search
 
-  - name: Ensure gem executable was removed from custom directory
-    assert:
-      that:
-        - install_gem_result is changed
-        - not gem_bindir_stat.stat.exists
+- name: Ensure gem was removed in custom directory
+  ansible.builtin.assert:
+    that:
+      - install_gem_result is changed
+      - gem_search.files | length == 0
+
+# Custom directory for executables (--bindir)
+- name: Install gem with custom bindir
+  community.general.gem:
+    name: gist
+    state: present
+    bindir: "{{ remote_tmp_dir }}/custom_bindir"
+    norc: true
+    user_install: false
+  register: install_gem_result
+
+- name: Get stats of gem executable
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/custom_bindir/gist"
+  register: gem_bindir_stat
+
+- name: Ensure gem executable was installed in custom directory
+  ansible.builtin.assert:
+    that:
+      - install_gem_result is changed
+      - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
+
+- name: Remove gem with custom bindir
+  community.general.gem:
+    name: gist
+    state: absent
+    bindir: "{{ remote_tmp_dir }}/custom_bindir"
+    norc: true
+    user_install: false
+  register: install_gem_result
+
+- name: Get stats of gem executable
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/custom_bindir/gist"
+  register: gem_bindir_stat
+
+- name: Ensure gem executable was removed from custom directory
+  ansible.builtin.assert:
+    that:
+      - install_gem_result is changed
+      - not gem_bindir_stat.stat.exists
+
+# override_platform_install_dir: install and remove using explicit user gem dir
+- name: Install a gem with override_platform_install_dir
+  community.general.gem:
+    name: gist
+    state: present
+    override_platform_install_dir: true
+  register: install_gem_result
+
+- name: List gems
+  ansible.builtin.command: gem list
+  register: current_gems
+
+- name: Ensure gem was installed with override_platform_install_dir
+  ansible.builtin.assert:
+    that:
+      - install_gem_result is changed
+      - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+
+- name: Install a gem with override_platform_install_dir (idempotency)
+  community.general.gem:
+    name: gist
+    state: present
+    override_platform_install_dir: true
+  register: install_gem_result
+
+- name: Ensure install is idempotent
+  ansible.builtin.assert:
+    that:
+      - install_gem_result is not changed
+
+- name: Remove a gem with override_platform_install_dir
+  community.general.gem:
+    name: gist
+    state: absent
+    override_platform_install_dir: true
+  register: remove_gem_result
+
+- name: List gems
+  ansible.builtin.command: gem list
+  register: current_gems
+
+- name: Verify gem was removed with override_platform_install_dir
+  ansible.builtin.assert:
+    that:
+      - remove_gem_result is changed
+      - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+
+- name: Attempt to uninstall default gem 'json'
+  community.general.gem:
+    name: json
+    state: absent
+  when: ansible_facts.distribution == "Ubuntu"
+  register: gem_result
+  ignore_errors: true
+
+- name: Assert gem uninstall failed as expected
+  when: ansible_facts.distribution == "Ubuntu"
+  ansible.builtin.assert:
+    that:
+      - gem_result is failed
+      - gem_result.msg.startswith("Failed to uninstall gem 'json'")

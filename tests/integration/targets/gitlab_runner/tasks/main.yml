@@ -1,23 +1,28 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Install required libs
-  pip:
+  ansible.builtin.pip:
     name: python-gitlab
     state: present
 
 - name: Create {{ gitlab_project_name }}
-  gitlab_project:
+  community.general.gitlab_project:
     server_url: "{{ gitlab_host }}"
-    validate_certs: False
+    validate_certs: false
     login_token: "{{ gitlab_login_token }}"
     name: "{{ gitlab_project_name }}"
     state: present
 
 - name: Cleanup GitLab runner
-  gitlab_runner:
+  community.general.gitlab_runner:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -26,7 +31,7 @@
     state: absent
 
 - name: Create GitLab Runner
-  gitlab_runner:
+  community.general.gitlab_runner:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -36,14 +41,14 @@
   register: gitlab_runner_state
 
 - name: Test group created
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_runner_state is changed
 
 
 #### COMMENTED AS MODULE WILL UPDATE THE RUNNER IF EXISTS. TO BE DISCUSSED ####
 # - name: Create GitLab Runner ( Idempotency test )
-#   gitlab_runner:
+#   community.general.gitlab_runner:
 #     server_url: "{{ gitlab_host }}"
 #     validate_certs: false
 #     login_token: "{{ gitlab_login_token }}"
@@ -53,12 +58,12 @@
 #   register: gitlab_runner_state_again
 
 # - name: Test module is idempotent
-#   assert:
+#   ansible.builtin.assert:
 #     that:
 #       - gitlab_runner_state_again is not changed
 
 - name: Remove GitLab Runner
-  gitlab_runner:
+  community.general.gitlab_runner:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -68,6 +73,6 @@
   register: gitlab_runner_state_absent
 
 - name: Assert runner has been removed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_runner_state_absent is changed

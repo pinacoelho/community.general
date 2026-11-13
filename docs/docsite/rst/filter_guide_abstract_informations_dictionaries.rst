@@ -1,7 +1,12 @@
+..
+  Copyright (c) Ansible Project
+  GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+  SPDX-License-Identifier: GPL-3.0-or-later
+
 Dictionaries
 ^^^^^^^^^^^^
 
-You can use the ``dict_kv`` filter to create a single-entry dictionary with ``value | community.general.dict_kv(key)``:
+You can use the :ansplugin:`community.general.dict_kv filter <community.general.dict_kv#filter>` to create a single-entry dictionary with ``value | community.general.dict_kv(key)``:
 
 .. code-block:: yaml+jinja
 
@@ -21,21 +26,32 @@ You can use the ``dict_kv`` filter to create a single-entry dictionary with ``va
           type: host
           database: all
         myservers:
-        - server1
-        - server2
+          - server1
+          - server2
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Create a single-entry dictionary]  **************************************************
+    TASK [Create a single-entry dictionary] ***************************************************
     ok: [localhost] => {
         "msg": {
             "thatsmyvar": "myvalue"
         }
     }
 
-    TASK [Create a list of dictionaries where the 'server' field is taken from a list]  *******
+    TASK [Create a list of dictionaries where the 'server' field is taken from a list] ********
     ok: [localhost] => {
         "msg": [
             {
@@ -53,7 +69,7 @@ This produces:
 
 .. versionadded:: 2.0.0
 
-If you need to convert a list of key-value pairs to a dictionary, you can use the ``dict`` function. Unfortunately, this function cannot be used with ``map``. For this, the ``community.general.dict`` filter can be used:
+If you need to convert a list of key-value pairs to a dictionary, you can use the ``dict`` function. Unfortunately, this function cannot be used with ``map``. For this, the :ansplugin:`community.general.dict filter <community.general.dict#filter>` can be used:
 
 .. code-block:: yaml+jinja
 
@@ -82,9 +98,20 @@ If you need to convert a list of key-value pairs to a dictionary, you can use th
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Create a dictionary with the dict function]  ****************************************
+    TASK [Create a dictionary with the dict function] *****************************************
     ok: [localhost] => {
         "msg": {
             "1": 2,
@@ -92,7 +119,7 @@ This produces:
         }
     }
 
-    TASK [Create a dictionary with the community.general.dict filter]  ************************
+    TASK [Create a dictionary with the community.general.dict filter] *************************
     ok: [localhost] => {
         "msg": {
             "1": 2,
@@ -100,7 +127,7 @@ This produces:
         }
     }
 
-    TASK [Create a list of dictionaries with map and the community.general.dict filter]  ******
+    TASK [Create a list of dictionaries with map and the community.general.dict filter] *******
     ok: [localhost] => {
         "msg": [
             {

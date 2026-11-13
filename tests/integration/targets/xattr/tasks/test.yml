@@ -1,67 +1,72 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Set attributes
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     key: user.foo
     value: bar
   register: xattr_set_result
 
 - name: Get attributes
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
   register: xattr_get_all_result
 
 - name: Get specific attribute
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     key: foo
   register: xattr_get_specific_result
 
-- assert:
+- ansible.builtin.assert:
     that:
-    - "xattr_set_result.changed"
-    - "xattr_get_all_result['xattr']['user.foo'] == 'bar'"
-    - "not xattr_get_all_result.changed"
-    - "xattr_get_specific_result['xattr']['user.foo'] == 'bar'"
-    - "not xattr_get_specific_result.changed"
+      - "xattr_set_result is changed"
+      - "xattr_get_all_result['xattr']['user.foo'] == 'bar'"
+      - "xattr_get_all_result is not changed"
+      - "xattr_get_specific_result['xattr']['user.foo'] == 'bar'"
+      - "xattr_get_specific_result is not changed"
 
 - name: Set attribute again
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     namespace: user
     key: foo
     value: bar
   register: xattr_set_again_result
 
-- assert:
+- ansible.builtin.assert:
     that:
-    - "not xattr_set_again_result.changed"
+      - "xattr_set_again_result is not changed"
 
 - name: Unset attribute
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     key: foo
     state: absent
   register: xattr_unset_result
 
 - name: Get attributes
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
   register: xattr_get_after_unset_result
 
-- assert:
+- ansible.builtin.assert:
     that:
-    - "xattr_unset_result.changed"
-    - "xattr_get_after_unset_result['xattr'] == {}"
-    - "not xattr_get_after_unset_result.changed"
+      - "xattr_unset_result is changed"
+      - "xattr_get_after_unset_result['xattr'] == {}"
+      - "xattr_get_after_unset_result is not changed"
 
 - name: Unset attribute again
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     namespace: user
     key: foo
     state: absent
   register: xattr_unset_result
 
-- assert:
+- ansible.builtin.assert:
     that:
-    - "not xattr_set_again_result.changed"
+      - "xattr_unset_result is not changed"

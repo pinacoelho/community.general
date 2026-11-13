@@ -1,10 +1,15 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Create customer (check mode)
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -14,12 +19,12 @@
   register: result
 
 - name: Check result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
 - name: Create customer
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -28,12 +33,12 @@
   register: result
 
 - name: Check customer creation
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
 - name: Test customer creation idempotency
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -42,12 +47,12 @@
   register: result
 
 - name: Check customer creation idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
 - name: Delete customer (check mode)
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -58,12 +63,12 @@
   register: result
 
 - name: Check customer deletion (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
 - name: Delete customer
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -73,12 +78,12 @@
   register: result
 
 - name: Check customer deletion
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
 - name: Test customer deletion idempotency
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -88,12 +93,12 @@
   register: result
 
 - name: Check customer deletion idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
 - name: Delete non-existing customer (check mode)
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -104,12 +109,12 @@
   register: result
 
 - name: Check non-existing customer deletion (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
 - name: Create customer with api key
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_key: "{{ alerta_key }}"
     customer: customer1
@@ -117,12 +122,12 @@
   register: result
 
 - name: Check customer creation with api key
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
 - name: Delete customer with api key
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_key: "{{ alerta_key }}"
     customer: customer1
@@ -131,12 +136,12 @@
   register: result
 
 - name: Check customer deletion with api key
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
 - name: Use wrong api key
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_key: wrong_key
     customer: customer1
@@ -145,7 +150,7 @@
   ignore_errors: true
 
 - name: Check customer creation with api key
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result is failed

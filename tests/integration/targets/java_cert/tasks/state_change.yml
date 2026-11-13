@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 #
 # Prepare X509 and PKCS#12 materials
 #
@@ -45,7 +49,7 @@
     certificate_path: "{{ test_cert_path }}"
     privatekey_path: "{{ test_key_path }}"
   when:
-    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+    - "not (ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_version is version('8.0', '<'))"
 
 - name: Create the pkcs12 archive from the test x509 cert (command)
   ansible.builtin.command:
@@ -58,8 +62,8 @@
       -passout stdin
     stdin: "{{ test_keystore2_password }}"
   when:
-    - "ansible_os_family == 'RedHat'"
-    - "ansible_distribution_version is version('8.0', '<')"
+    - "ansible_facts.os_family == 'RedHat'"
+    - "ansible_facts.distribution_version is version('8.0', '<')"
 
 - name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore
   community.crypto.openssl_pkcs12:
@@ -69,7 +73,7 @@
     certificate_path: "{{ test_cert2_path }}"
     privatekey_path: "{{ test_key2_path }}"
   when:
-    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+    - "not (ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_version is version('8.0', '<'))"
 
 - name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore (command)
   ansible.builtin.command:
@@ -82,12 +86,46 @@
       -passout stdin
     stdin: "{{ test_keystore2_password }}"
   when:
-    - "ansible_os_family == 'RedHat'"
-    - "ansible_distribution_version is version('8.0', '<')"
+    - "ansible_facts.os_family == 'RedHat'"
+    - "ansible_facts.distribution_version is version('8.0', '<')"
 
 #
 # Run tests
 #
+
+- name: import cert with too-short keystore password should fail
+  community.general.java_cert:
+    cert_alias: test_cert
+    cert_path: "{{ test_cert_path }}"
+    keystore_path: "{{ remote_tmp_dir }}/keystore_short_pass.jks"
+    keystore_pass: ""
+    keystore_create: true
+    state: present
+  ignore_errors: true
+  register: result_short_pass_cert
+
+- name: verify failure with too-short keystore password for cert import
+  ansible.builtin.assert:
+    that:
+      - result_short_pass_cert is failed
+
+- name: import pkcs12 with too-short keystore password should fail
+  community.general.java_cert:
+    cert_alias: test_pkcs12_cert
+    pkcs12_alias: test_pkcs12_cert
+    pkcs12_path: "{{ test_pkcs_path }}"
+    pkcs12_password: "{{ test_keystore2_password }}"
+    keystore_path: "{{ remote_tmp_dir }}/keystore_short_pass_pkcs12.jks"
+    keystore_pass: ""
+    keystore_create: true
+    state: present
+  ignore_errors: true
+  register: result_short_pass_pkcs12
+
+- name: verify failure with too-short keystore password for pkcs12 import
+  ansible.builtin.assert:
+    that:
+      - result_short_pass_pkcs12 is failed
 
 - name: try to create the test keystore based on the just created pkcs12, keystore_create flag not enabled
   community.general.java_cert:
@@ -113,7 +151,7 @@
     pkcs12_password: "{{ test_keystore2_password }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
-    keystore_create: yes
+    keystore_create: true
 
 - name: List newly created keystore content
   ansible.builtin.command:
@@ -134,8 +172,8 @@
     pkcs12_password: "{{ test_keystore2_password }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
-    keystore_create: yes
-  ignore_errors: yes
+    keystore_create: true
+  ignore_errors: true
   register: result_x509_changed
 
 - name: Verify the x509 status is failed
@@ -143,13 +181,13 @@
     that:
       - result_x509_changed is failed
 
-- name:  import initial test certificate from file path
+- name: Import initial test certificate from file path
   community.general.java_cert:
     cert_alias: test_cert
     cert_path: "{{ test_cert_path }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
-    keystore_create: yes
+    keystore_create: true
     state: present
   register: result_x509_changed
 
@@ -177,7 +215,7 @@
       - result_x509_changed is changed
 
 - name: |
-    We also want to make sure that the status doesnt change if we import the same cert
+    We also want to make sure that the status does not change if we import the same cert
   community.general.java_cert:
     cert_alias: test_cert
     cert_path: "{{ test_cert2_path }}"
@@ -237,17 +275,17 @@
       - result_pkcs12_succeeded is succeeded
 
 - name: Copy the ssl server script
-  copy:
+  ansible.builtin.copy:
     src: "setupSSLServer.py"
     dest: "{{ remote_tmp_dir }}"
 
 - name: Create an SSL server that we will use for testing URL imports
-  command: "{{ ansible_python.executable }} {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}"
+  ansible.builtin.command: "{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}"
   async: 10
   poll: 0
 
 - name: "Wait for one second to make sure that the serve script has actually been started"
-  pause:
+  ansible.builtin.pause:
     seconds: 1
 
 - name: |

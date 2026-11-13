@@ -1,263 +1,363 @@
 ---
-requires_ansible: '>=2.11.0'
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+requires_ansible: '>=2.19.0'
+action_groups:
+  consul:
+    - consul_agent_check
+    - consul_agent_service
+    - consul_auth_method
+    - consul_binding_rule
+    - consul_kv
+    - consul_kv_info
+    - consul_policy
+    - consul_role
+    - consul_session
+    - consul_token
+  proxmox:
+    - metadata:
+        extend_group:
+          - community.proxmox.proxmox
+  keycloak:
+    - metadata:
+        extend_group:
+          - middleware_automation.keycloak.keycloak
+  scaleway:
+    - scaleway_compute
+    - scaleway_compute_private_network
+    - scaleway_container
+    - scaleway_container_info
+    - scaleway_container_namespace
+    - scaleway_container_namespace_info
+    - scaleway_container_registry
+    - scaleway_container_registry_info
+    - scaleway_database_backup
+    - scaleway_function
+    - scaleway_function_info
+    - scaleway_function_namespace
+    - scaleway_function_namespace_info
+    - scaleway_image_info
+    - scaleway_ip
+    - scaleway_ip_info
+    - scaleway_lb
+    - scaleway_organization_info
+    - scaleway_private_network
+    - scaleway_security_group
+    - scaleway_security_group_info
+    - scaleway_security_group_rule
+    - scaleway_server_info
+    - scaleway_snapshot_info
+    - scaleway_sshkey
+    - scaleway_user_data
+    - scaleway_volume
+    - scaleway_volume_info
+
 plugin_routing:
+  callback:
+    actionable:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts
+          = no' and 'display_ok_hosts = no' options.
+    full_skip:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts
+          = no' option.
+    hipchat:
+      tombstone:
+        removal_version: 10.0.0
+        warning_text: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
+    loganalytics:
+      tombstone:
+        removal_version: 14.0.0
+        warning_text: The "HTTP Data Collector API" used by the plugin has been deprecated in Azure and replaced with the "Logs Ingestion API".  Please migrate to the 'community.general.loganalytics_ingestion' plugin.
+    osx_say:
+      redirect: community.general.say
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.osx_say to community.general.say will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    stderr:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the 'default' callback plugin with 'display_failed_stderr
+          = yes' option.
+    yaml:
+      tombstone:
+        removal_version: 12.0.0
+        warning_text: >-
+          The plugin has been superseded by the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
   connection:
     docker:
       redirect: community.docker.docker
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker to community.docker.docker will be removed in community.general 18.0.0. Please update your roles/playbooks.
     oc:
       redirect: community.okd.oc
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.oc to community.okd.oc will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    proxmox_pct_remote:
+      redirect: community.proxmox.proxmox_pct_remote
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
   lookup:
     gcp_storage_file:
       redirect: community.google.gcp_storage_file
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcp_storage_file to community.google.gcp_storage_file will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hashi_vault to community.hashi_vault.hashi_vault will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    hiera:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Hiera has been deprecated a long time ago.
+    manifold:
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: Company was acquired in 2021 and service was ceased afterwards.
     nios:
       redirect: infoblox.nios_modules.nios_lookup
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios to infoblox.nios_modules.nios_lookup will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_next_ip:
       redirect: infoblox.nios_modules.nios_next_ip
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_next_ip to infoblox.nios_modules.nios_next_ip will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_next_network:
       redirect: infoblox.nios_modules.nios_next_network
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_next_network to infoblox.nios_modules.nios_next_network will be removed in community.general 18.0.0. Please update your roles/playbooks.
   modules:
-    aerospike_migrations:
-      redirect: community.general.database.aerospike.aerospike_migrations
-    airbrake_deployment:
-      redirect: community.general.monitoring.airbrake_deployment
-    aix_devices:
-      redirect: community.general.system.aix_devices
-    aix_filesystem:
-      redirect: community.general.system.aix_filesystem
-    aix_inittab:
-      redirect: community.general.system.aix_inittab
-    aix_lvg:
-      redirect: community.general.system.aix_lvg
-    aix_lvol:
-      redirect: community.general.system.aix_lvol
-    alerta_customer:
-      redirect: community.general.monitoring.alerta_customer
-    ali_instance:
-      redirect: community.general.cloud.alicloud.ali_instance
     ali_instance_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ali_instance_info instead.
-    ali_instance_info:
-      redirect: community.general.cloud.alicloud.ali_instance_info
-    alternatives:
-      redirect: community.general.system.alternatives
-    ansible_galaxy_install:
-      redirect: community.general.packaging.language.ansible_galaxy_install
-    apache2_mod_proxy:
-      redirect: community.general.web_infrastructure.apache2_mod_proxy
-    apache2_module:
-      redirect: community.general.web_infrastructure.apache2_module
-    apk:
-      redirect: community.general.packaging.os.apk
-    apt_repo:
-      redirect: community.general.packaging.os.apt_repo
-    apt_rpm:
-      redirect: community.general.packaging.os.apt_rpm
-    archive:
-      redirect: community.general.files.archive
     atomic_container:
-      redirect: community.general.cloud.atomic.atomic_container
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Project Atomic was sunset by the end of 2019.
     atomic_host:
-      redirect: community.general.cloud.atomic.atomic_host
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Project Atomic was sunset by the end of 2019.
     atomic_image:
-      redirect: community.general.cloud.atomic.atomic_image
-    awall:
-      redirect: community.general.system.awall
-    beadm:
-      redirect: community.general.system.beadm
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Project Atomic was sunset by the end of 2019.
     bearychat:
-      redirect: community.general.notification.bearychat
-    bigpanda:
-      redirect: community.general.monitoring.bigpanda
-    bitbucket_access_key:
-      redirect: community.general.source_control.bitbucket.bitbucket_access_key
-    bitbucket_pipeline_key_pair:
-      redirect: community.general.source_control.bitbucket.bitbucket_pipeline_key_pair
-    bitbucket_pipeline_known_host:
-      redirect: community.general.source_control.bitbucket.bitbucket_pipeline_known_host
-    bitbucket_pipeline_variable:
-      redirect: community.general.source_control.bitbucket.bitbucket_pipeline_variable
-    bower:
-      redirect: community.general.packaging.language.bower
-    bundler:
-      redirect: community.general.packaging.language.bundler
-    bzr:
-      redirect: community.general.source_control.bzr
-    campfire:
-      redirect: community.general.notification.campfire
-    capabilities:
-      redirect: community.general.system.capabilities
-    cargo:
-      redirect: community.general.packaging.language.cargo
+      tombstone:
+        removal_version: 12.0.0
+        warning_text: Chat service is no longer available.
     catapult:
-      redirect: community.general.notification.catapult
-    circonus_annotation:
-      redirect: community.general.monitoring.circonus_annotation
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module since Oct 2024. See https://github.com/ansible-collections/community.general/issues/10318 for details.
     cisco_spark:
-      redirect: community.general.notification.cisco_spark
-    cisco_webex:
-      redirect: community.general.notification.cisco_webex
-    clc_aa_policy:
-      redirect: community.general.cloud.centurylink.clc_aa_policy
+      redirect: community.general.cisco_webex
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.cisco_spark to community.general.cisco_webex will be removed in community.general 18.0.0. Please update your roles/playbooks.
     clc_alert_policy:
-      redirect: community.general.cloud.centurylink.clc_alert_policy
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_blueprint_package:
-      redirect: community.general.cloud.centurylink.clc_blueprint_package
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_firewall_policy:
-      redirect: community.general.cloud.centurylink.clc_firewall_policy
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_group:
-      redirect: community.general.cloud.centurylink.clc_group
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_loadbalancer:
-      redirect: community.general.cloud.centurylink.clc_loadbalancer
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_modify_server:
-      redirect: community.general.cloud.centurylink.clc_modify_server
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_publicip:
-      redirect: community.general.cloud.centurylink.clc_publicip
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_server:
-      redirect: community.general.cloud.centurylink.clc_server
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_server_snapshot:
-      redirect: community.general.cloud.centurylink.clc_server_snapshot
-    cloud_init_data_facts:
-      redirect: community.general.cloud.misc.cloud_init_data_facts
-    cloudflare_dns:
-      redirect: community.general.net_tools.cloudflare_dns
-    cobbler_sync:
-      redirect: community.general.remote_management.cobbler.cobbler_sync
-    cobbler_system:
-      redirect: community.general.remote_management.cobbler.cobbler_system
-    composer:
-      redirect: community.general.packaging.language.composer
-    consul:
-      redirect: community.general.clustering.consul.consul
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     consul_acl:
-      redirect: community.general.clustering.consul.consul_acl
-    consul_kv:
-      redirect: community.general.clustering.consul.consul_kv
-    consul_session:
-      redirect: community.general.clustering.consul.consul_session
-    copr:
-      redirect: community.general.packaging.os.copr
-    cpanm:
-      redirect: community.general.packaging.language.cpanm
-    cronvar:
-      redirect: community.general.system.cronvar
-    crypttab:
-      redirect: community.general.system.crypttab
-    datadog_downtime:
-      redirect: community.general.monitoring.datadog.datadog_downtime
-    datadog_event:
-      redirect: community.general.monitoring.datadog.datadog_event
-    datadog_monitor:
-      redirect: community.general.monitoring.datadog.datadog_monitor
-    dconf:
-      redirect: community.general.system.dconf
-    deploy_helper:
-      redirect: community.general.web_infrastructure.deploy_helper
+      tombstone:
+        removal_version: 10.0.0
+        warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
     dimensiondata_network:
-      redirect: community.general.cloud.dimensiondata.dimensiondata_network
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     dimensiondata_vlan:
-      redirect: community.general.cloud.dimensiondata.dimensiondata_vlan
-    discord:
-      redirect: community.general.notification.discord
-    django_manage:
-      redirect: community.general.web_infrastructure.django_manage
-    dnf_versionlock:
-      redirect: community.general.packaging.os.dnf_versionlock
-    dnsimple:
-      redirect: community.general.net_tools.dnsimple
-    dnsimple_info:
-      redirect: community.general.net_tools.dnsimple_info
-    dnsmadeeasy:
-      redirect: community.general.net_tools.dnsmadeeasy
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     docker_compose:
       redirect: community.docker.docker_compose
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_compose to community.docker.docker_compose will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_config:
       redirect: community.docker.docker_config
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_config to community.docker.docker_config will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_container:
       redirect: community.docker.docker_container
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_container to community.docker.docker_container will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_container_info:
       redirect: community.docker.docker_container_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_container_info to community.docker.docker_container_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_host_info:
       redirect: community.docker.docker_host_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_host_info to community.docker.docker_host_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_image:
       redirect: community.docker.docker_image
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_image to community.docker.docker_image will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_image_facts:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.docker.docker_image_info instead.
     docker_image_info:
       redirect: community.docker.docker_image_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_image_info to community.docker.docker_image_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_login:
       redirect: community.docker.docker_login
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_login to community.docker.docker_login will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_network:
       redirect: community.docker.docker_network
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_network to community.docker.docker_network will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_network_info:
       redirect: community.docker.docker_network_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_network_info to community.docker.docker_network_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_node:
       redirect: community.docker.docker_node
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_node to community.docker.docker_node will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_node_info:
       redirect: community.docker.docker_node_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_node_info to community.docker.docker_node_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_prune:
       redirect: community.docker.docker_prune
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_prune to community.docker.docker_prune will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_secret:
       redirect: community.docker.docker_secret
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_secret to community.docker.docker_secret will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_service:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.docker.docker_compose instead.
     docker_stack:
       redirect: community.docker.docker_stack
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_stack to community.docker.docker_stack will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_stack_info:
       redirect: community.docker.docker_stack_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_stack_info to community.docker.docker_stack_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_stack_task_info:
       redirect: community.docker.docker_stack_task_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_stack_task_info to community.docker.docker_stack_task_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm:
       redirect: community.docker.docker_swarm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm to community.docker.docker_swarm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm_info:
       redirect: community.docker.docker_swarm_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm_info to community.docker.docker_swarm_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm_service:
       redirect: community.docker.docker_swarm_service
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm_service to community.docker.docker_swarm_service will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm_service_info:
       redirect: community.docker.docker_swarm_service_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm_service_info to community.docker.docker_swarm_service_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_volume:
       redirect: community.docker.docker_volume
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_volume to community.docker.docker_volume will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_volume_info:
       redirect: community.docker.docker_volume_info
-    dpkg_divert:
-      redirect: community.general.system.dpkg_divert
-    easy_install:
-      redirect: community.general.packaging.language.easy_install
-    ejabberd_user:
-      redirect: community.general.web_infrastructure.ejabberd_user
-    elasticsearch_plugin:
-      redirect: community.general.database.misc.elasticsearch_plugin
-    emc_vnx_sg_member:
-      redirect: community.general.storage.emc.emc_vnx_sg_member
-    etcd3:
-      redirect: community.general.clustering.etcd3
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_volume_info to community.docker.docker_volume_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     facter:
-      redirect: community.general.system.facter
-    filesize:
-      redirect: community.general.files.filesize
-    filesystem:
-      redirect: community.general.system.filesystem
-    flatpak:
-      redirect: community.general.packaging.os.flatpak
-    flatpak_remote:
-      redirect: community.general.packaging.os.flatpak_remote
+      tombstone:
+        removal_version: 12.0.0
+        warning_text: Use community.general.facter_facts instead.
     flowdock:
-      redirect: community.general.notification.flowdock
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     foreman:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
-    gandi_livedns:
-      redirect: community.general.net_tools.gandi_livedns
     gc_storage:
       redirect: community.google.gc_storage
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gc_storage to community.google.gc_storage will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcdns_record:
       tombstone:
         removal_version: 2.0.0
@@ -272,26 +372,54 @@ plugin_routing:
         warning_text: Use google.cloud.gcp_compute_instance instead.
     gce_eip:
       redirect: community.google.gce_eip
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_eip to community.google.gce_eip will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_img:
       redirect: community.google.gce_img
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_img to community.google.gce_img will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_instance_template:
       redirect: community.google.gce_instance_template
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_instance_template to community.google.gce_instance_template will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_labels:
       redirect: community.google.gce_labels
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_labels to community.google.gce_labels will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_lb:
       redirect: community.google.gce_lb
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_lb to community.google.gce_lb will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_mig:
       redirect: community.google.gce_mig
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_mig to community.google.gce_mig will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_net:
       redirect: community.google.gce_net
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_net to community.google.gce_net will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_pd:
       redirect: community.google.gce_pd
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_pd to community.google.gce_pd will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_snapshot:
       redirect: community.google.gce_snapshot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_snapshot to community.google.gce_snapshot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_tag:
       redirect: community.google.gce_tag
-    gconftool2:
-      redirect: community.general.system.gconftool2
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_tag to community.google.gce_tag will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcp_backend_service:
       tombstone:
         removal_version: 2.0.0
@@ -316,344 +444,323 @@ plugin_routing:
         warning_text: Use google.cloud.gcp_compute_url_map instead.
     gcpubsub:
       redirect: community.google.gcpubsub
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcpubsub to community.google.gcpubsub will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcpubsub_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.google.gcpubsub_info instead.
     gcpubsub_info:
       redirect: community.google.gcpubsub_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcpubsub_info to community.google.gcpubsub_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcspanner:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use google.cloud.gcp_spanner_database and/or google.cloud.gcp_spanner_instance
           instead.
-    gem:
-      redirect: community.general.packaging.language.gem
-    git_config:
-      redirect: community.general.source_control.git_config
-    github_deploy_key:
-      redirect: community.general.source_control.github.github_deploy_key
     github_hooks:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.general.github_webhook and community.general.github_webhook_info
           instead.
-    github_issue:
-      redirect: community.general.source_control.github.github_issue
-    github_key:
-      redirect: community.general.source_control.github.github_key
-    github_release:
-      redirect: community.general.source_control.github.github_release
-    github_repo:
-      redirect: community.general.source_control.github.github_repo
-    github_webhook:
-      redirect: community.general.source_control.github.github_webhook
-    github_webhook_info:
-      redirect: community.general.source_control.github.github_webhook_info
-    gitlab_branch:
-      redirect: community.general.source_control.gitlab.gitlab_branch
-    gitlab_deploy_key:
-      redirect: community.general.source_control.gitlab.gitlab_deploy_key
-    gitlab_group:
-      redirect: community.general.source_control.gitlab.gitlab_group
-    gitlab_group_members:
-      redirect: community.general.source_control.gitlab.gitlab_group_members
-    gitlab_group_variable:
-      redirect: community.general.source_control.gitlab.gitlab_group_variable
-    gitlab_hook:
-      redirect: community.general.source_control.gitlab.gitlab_hook
-    gitlab_project:
-      redirect: community.general.source_control.gitlab.gitlab_project
-    gitlab_project_members:
-      redirect: community.general.source_control.gitlab.gitlab_project_members
-    gitlab_project_variable:
-      redirect: community.general.source_control.gitlab.gitlab_project_variable
-    gitlab_protected_branch:
-      redirect: community.general.source_control.gitlab.gitlab_protected_branch
-    gitlab_runner:
-      redirect: community.general.source_control.gitlab.gitlab_runner
-    gitlab_user:
-      redirect: community.general.source_control.gitlab.gitlab_user
-    grove:
-      redirect: community.general.notification.grove
-    gunicorn:
-      redirect: community.general.web_infrastructure.gunicorn
     hana_query:
-      redirect: community.general.database.saphana.hana_query
-    haproxy:
-      redirect: community.general.net_tools.haproxy
-    heroku_collaborator:
-      redirect: community.general.cloud.heroku.heroku_collaborator
+      redirect: community.sap_libs.sap_hdbsql
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hana_query to community.sap_libs.sap_hdbsql will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_failover_ip to community.hrobot.failover_ip will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_failover_ip_info:
       redirect: community.hrobot.failover_ip_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_failover_ip_info to community.hrobot.failover_ip_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_firewall:
       redirect: community.hrobot.firewall
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_firewall to community.hrobot.firewall will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_firewall_info:
       redirect: community.hrobot.firewall_info
-    hg:
-      redirect: community.general.source_control.hg
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_firewall_info to community.hrobot.firewall_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hipchat:
-      redirect: community.general.notification.hipchat
-    homebrew:
-      redirect: community.general.packaging.os.homebrew
-    homebrew_cask:
-      redirect: community.general.packaging.os.homebrew_cask
-    homebrew_tap:
-      redirect: community.general.packaging.os.homebrew_tap
-    homectl:
-      redirect: community.general.system.homectl
-    honeybadger_deployment:
-      redirect: community.general.monitoring.honeybadger_deployment
-    hpilo_boot:
-      redirect: community.general.remote_management.hpilo.hpilo_boot
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
     hpilo_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.hpilo_info instead.
-    hpilo_info:
-      redirect: community.general.remote_management.hpilo.hpilo_info
-    hponcfg:
-      redirect: community.general.remote_management.hpilo.hponcfg
-    htpasswd:
-      redirect: community.general.web_infrastructure.htpasswd
-    hwc_ecs_instance:
-      redirect: community.general.cloud.huawei.hwc_ecs_instance
-    hwc_evs_disk:
-      redirect: community.general.cloud.huawei.hwc_evs_disk
-    hwc_network_vpc:
-      redirect: community.general.cloud.huawei.hwc_network_vpc
-    hwc_smn_topic:
-      redirect: community.general.cloud.huawei.hwc_smn_topic
-    hwc_vpc_eip:
-      redirect: community.general.cloud.huawei.hwc_vpc_eip
-    hwc_vpc_peering_connect:
-      redirect: community.general.cloud.huawei.hwc_vpc_peering_connect
-    hwc_vpc_port:
-      redirect: community.general.cloud.huawei.hwc_vpc_port
-    hwc_vpc_private_ip:
-      redirect: community.general.cloud.huawei.hwc_vpc_private_ip
-    hwc_vpc_route:
-      redirect: community.general.cloud.huawei.hwc_vpc_route
-    hwc_vpc_security_group:
-      redirect: community.general.cloud.huawei.hwc_vpc_security_group
-    hwc_vpc_security_group_rule:
-      redirect: community.general.cloud.huawei.hwc_vpc_security_group_rule
-    hwc_vpc_subnet:
-      redirect: community.general.cloud.huawei.hwc_vpc_subnet
-    ibm_sa_domain:
-      redirect: community.general.storage.ibm.ibm_sa_domain
-    ibm_sa_host:
-      redirect: community.general.storage.ibm.ibm_sa_host
-    ibm_sa_host_ports:
-      redirect: community.general.storage.ibm.ibm_sa_host_ports
-    ibm_sa_pool:
-      redirect: community.general.storage.ibm.ibm_sa_pool
-    ibm_sa_vol:
-      redirect: community.general.storage.ibm.ibm_sa_vol
-    ibm_sa_vol_map:
-      redirect: community.general.storage.ibm.ibm_sa_vol_map
-    icinga2_feature:
-      redirect: community.general.monitoring.icinga2_feature
-    icinga2_host:
-      redirect: community.general.monitoring.icinga2_host
+    aix_devices:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.devices instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_filesystem:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.filesystem instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_inittab:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.inittab instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_lvg:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.lvg instead. The C(ibm.power_aix) collection is actively maintained by IBM.
+    aix_lvol:
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.lvol instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware
-    idrac_redfish_command:
-      redirect: community.general.remote_management.redfish.idrac_redfish_command
-    idrac_redfish_config:
-      redirect: community.general.remote_management.redfish.idrac_redfish_config
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.idrac_firmware to dellemc.openmanage.idrac_firmware will be removed in community.general 18.0.0. Please update your roles/playbooks.
     idrac_redfish_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.idrac_redfish_info instead.
-    idrac_redfish_info:
-      redirect: community.general.remote_management.redfish.idrac_redfish_info
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
-    ilo_redfish_config:
-      redirect: community.general.remote_management.redfish.ilo_redfish_config
-    ilo_redfish_info:
-      redirect: community.general.remote_management.redfish.ilo_redfish_info
-    imc_rest:
-      redirect: community.general.remote_management.imc.imc_rest
-    imgadm:
-      redirect: community.general.cloud.smartos.imgadm
-    infinity:
-      redirect: community.general.net_tools.infinity.infinity
-    influxdb_database:
-      redirect: community.general.database.influxdb.influxdb_database
-    influxdb_query:
-      redirect: community.general.database.influxdb.influxdb_query
-    influxdb_retention_policy:
-      redirect: community.general.database.influxdb.influxdb_retention_policy
-    influxdb_user:
-      redirect: community.general.database.influxdb.influxdb_user
-    influxdb_write:
-      redirect: community.general.database.influxdb.influxdb_write
-    ini_file:
-      redirect: community.general.files.ini_file
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.idrac_server_config_profile to dellemc.openmanage.idrac_server_config_profile will be removed in community.general 18.0.0. Please update your roles/playbooks.
     installp:
-      redirect: community.general.packaging.os.installp
-    interfaces_file:
-      redirect: community.general.system.interfaces_file
-    ip_netns:
-      redirect: community.general.net_tools.ip_netns
-    ipa_config:
-      redirect: community.general.identity.ipa.ipa_config
-    ipa_dnsrecord:
-      redirect: community.general.identity.ipa.ipa_dnsrecord
-    ipa_dnszone:
-      redirect: community.general.identity.ipa.ipa_dnszone
-    ipa_group:
-      redirect: community.general.identity.ipa.ipa_group
-    ipa_hbacrule:
-      redirect: community.general.identity.ipa.ipa_hbacrule
-    ipa_host:
-      redirect: community.general.identity.ipa.ipa_host
-    ipa_hostgroup:
-      redirect: community.general.identity.ipa.ipa_hostgroup
-    ipa_otpconfig:
-      redirect: community.general.identity.ipa.ipa_otpconfig
-    ipa_otptoken:
-      redirect: community.general.identity.ipa.ipa_otptoken
-    ipa_pwpolicy:
-      redirect: community.general.identity.ipa.ipa_pwpolicy
-    ipa_role:
-      redirect: community.general.identity.ipa.ipa_role
-    ipa_service:
-      redirect: community.general.identity.ipa.ipa_service
-    ipa_subca:
-      redirect: community.general.identity.ipa.ipa_subca
-    ipa_sudocmd:
-      redirect: community.general.identity.ipa.ipa_sudocmd
-    ipa_sudocmdgroup:
-      redirect: community.general.identity.ipa.ipa_sudocmdgroup
-    ipa_sudorule:
-      redirect: community.general.identity.ipa.ipa_sudorule
-    ipa_user:
-      redirect: community.general.identity.ipa.ipa_user
-    ipa_vault:
-      redirect: community.general.identity.ipa.ipa_vault
-    ipify_facts:
-      redirect: community.general.net_tools.ipify_facts
-    ipinfoio_facts:
-      redirect: community.general.net_tools.ipinfoio_facts
-    ipmi_boot:
-      redirect: community.general.remote_management.ipmi.ipmi_boot
-    ipmi_power:
-      redirect: community.general.remote_management.ipmi.ipmi_power
-    iptables_state:
-      redirect: community.general.system.iptables_state
-    ipwcli_dns:
-      redirect: community.general.net_tools.ipwcli_dns
-    irc:
-      redirect: community.general.notification.irc
-    iso_create:
-      redirect: community.general.files.iso_create
-    iso_extract:
-      redirect: community.general.files.iso_extract
-    jabber:
-      redirect: community.general.notification.jabber
-    java_cert:
-      redirect: community.general.system.java_cert
-    java_keystore:
-      redirect: community.general.system.java_keystore
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: Use ibm.power_aix.installp instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     jboss:
-      redirect: community.general.web_infrastructure.jboss
-    jenkins_build:
-      redirect: community.general.web_infrastructure.jenkins_build
-    jenkins_job:
-      redirect: community.general.web_infrastructure.jenkins_job
+      tombstone:
+        removal_version: 14.0.0
+        warning_text: Use role middleware_automation.wildfly.wildfly_app_deploy instead.
     jenkins_job_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.jenkins_job_info instead.
-    jenkins_job_info:
-      redirect: community.general.web_infrastructure.jenkins_job_info
-    jenkins_plugin:
-      redirect: community.general.web_infrastructure.jenkins_plugin
-    jenkins_script:
-      redirect: community.general.web_infrastructure.jenkins_script
-    jira:
-      redirect: community.general.web_infrastructure.jira
     katello:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
-    kernel_blacklist:
-      redirect: community.general.system.kernel_blacklist
     keycloak_authentication:
-      redirect: community.general.identity.keycloak.keycloak_authentication
+      redirect: middleware_automation.keycloak.keycloak_authentication
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authentication_required_actions:
+      redirect: middleware_automation.keycloak.keycloak_authentication_required_actions
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authentication_v2:
+      redirect: middleware_automation.keycloak.keycloak_authentication_v2
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_authorization_scope:
+      redirect: middleware_automation.keycloak.keycloak_authz_authorization_scope
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_custom_policy:
+      redirect: middleware_automation.keycloak.keycloak_authz_custom_policy
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_permission:
+      redirect: middleware_automation.keycloak.keycloak_authz_permission
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_permission_info:
+      redirect: middleware_automation.keycloak.keycloak_authz_permission_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_client:
-      redirect: community.general.identity.keycloak.keycloak_client
+      redirect: middleware_automation.keycloak.keycloak_client
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_client_rolemapping:
-      redirect: community.general.identity.keycloak.keycloak_client_rolemapping
+      redirect: middleware_automation.keycloak.keycloak_client_rolemapping
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_client_rolescope:
+      redirect: middleware_automation.keycloak.keycloak_client_rolescope
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_clientscope:
-      redirect: community.general.identity.keycloak.keycloak_clientscope
+      redirect: middleware_automation.keycloak.keycloak_client_scope
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientscope_type:
+      redirect: middleware_automation.keycloak.keycloak_client_scope_type
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientscope_rolemappings:
+      redirect: middleware_automation.keycloak.keycloak_client_scope_rolemappings
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientsecret_info:
+      redirect: middleware_automation.keycloak.keycloak_clientsecret_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientsecret_regenerate:
+      redirect: middleware_automation.keycloak.keycloak_clientsecret_regenerate
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_clienttemplate:
-      redirect: community.general.identity.keycloak.keycloak_clienttemplate
+      redirect: middleware_automation.keycloak.keycloak_clienttemplate
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_component:
+      redirect: middleware_automation.keycloak.keycloak_component
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_component_info:
+      redirect: middleware_automation.keycloak.keycloak_component_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_group:
-      redirect: community.general.identity.keycloak.keycloak_group
+      redirect: middleware_automation.keycloak.keycloak_group
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_identity_provider:
-      redirect: community.general.identity.keycloak.keycloak_identity_provider
+      redirect: middleware_automation.keycloak.keycloak_identity_provider
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_realm:
-      redirect: community.general.identity.keycloak.keycloak_realm
+      redirect: middleware_automation.keycloak.keycloak_realm
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_realm_info:
-      redirect: community.general.identity.keycloak.keycloak_realm_info
+      redirect: middleware_automation.keycloak.keycloak_realm_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_key:
+      redirect: middleware_automation.keycloak.keycloak_realm_key
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_keys_metadata_info:
+      redirect: middleware_automation.keycloak.keycloak_realm_keys_metadata_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_localization:
+      redirect: middleware_automation.keycloak.keycloak_realm_localization
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_rolemapping:
+      redirect: middleware_automation.keycloak.keycloak_realm_rolemapping
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_users_info:
+      redirect: middleware_automation.keycloak.keycloak_realm_users_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_role:
-      redirect: community.general.identity.keycloak.keycloak_role
+      redirect: middleware_automation.keycloak.keycloak_role
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user:
+      redirect: middleware_automation.keycloak.keycloak_user
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_user_federation:
-      redirect: community.general.identity.keycloak.keycloak_user_federation
-    kibana_plugin:
-      redirect: community.general.database.misc.kibana_plugin
+      redirect: middleware_automation.keycloak.keycloak_user_federation
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user_rolemapping:
+      redirect: middleware_automation.keycloak.keycloak_user_rolemapping
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_userprofile:
+      redirect: middleware_automation.keycloak.keycloak_userprofile
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user_execute_actions_email:
+      redirect: middleware_automation.keycloak.keycloak_user_execute_actions_email
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     kubevirt_cdi_upload:
       redirect: community.kubevirt.kubevirt_cdi_upload
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_cdi_upload to community.kubevirt.kubevirt_cdi_upload will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_preset:
       redirect: community.kubevirt.kubevirt_preset
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_preset to community.kubevirt.kubevirt_preset will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_pvc:
       redirect: community.kubevirt.kubevirt_pvc
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_pvc to community.kubevirt.kubevirt_pvc will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_rs:
       redirect: community.kubevirt.kubevirt_rs
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_rs to community.kubevirt.kubevirt_rs will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_template:
       redirect: community.kubevirt.kubevirt_template
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_template to community.kubevirt.kubevirt_template will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
-    launchd:
-      redirect: community.general.system.launchd
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_vm to community.kubevirt.kubevirt_vm will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    lldp:
+      redirect: community.general.lldp_facts
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The lldp module has been renamed to lldp_facts.
     layman:
-      redirect: community.general.packaging.os.layman
-    lbu:
-      redirect: community.general.system.lbu
+      tombstone:
+        removal_version: 14.0.0
+        warning_text: Gentoo deprecated C(layman) in mid-2023.
     ldap_attr:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ldap_attrs instead.
-    ldap_attrs:
-      redirect: community.general.net_tools.ldap.ldap_attrs
-    ldap_entry:
-      redirect: community.general.net_tools.ldap.ldap_entry
-    ldap_passwd:
-      redirect: community.general.net_tools.ldap.ldap_passwd
-    ldap_search:
-      redirect: community.general.net_tools.ldap.ldap_search
-    librato_annotation:
-      redirect: community.general.monitoring.librato_annotation
     linode:
-      redirect: community.general.cloud.linode.linode
-    linode_v4:
-      redirect: community.general.cloud.linode.linode_v4
-    listen_ports_facts:
-      redirect: community.general.system.listen_ports_facts
-    lldp:
-      redirect: community.general.net_tools.lldp
-    locale_gen:
-      redirect: community.general.system.locale_gen
-    logentries:
-      redirect: community.general.monitoring.logentries
-    logentries_msg:
-      redirect: community.general.notification.logentries_msg
+      tombstone:
+        removal_version: 14.0.0
+        warning_text: The module relies on the sunset Linode API v3; use community.general.linode_v4 instead.
     logicmonitor:
       tombstone:
         removal_version: 1.0.0
@@ -664,86 +771,14 @@ plugin_routing:
         removal_version: 1.0.0
         warning_text: The logicmonitor_facts module is no longer maintained and the
           API used has been disabled in 2017.
-    logstash_plugin:
-      redirect: community.general.monitoring.logstash_plugin
-    lvg:
-      redirect: community.general.system.lvg
-    lvol:
-      redirect: community.general.system.lvol
-    lxc_container:
-      redirect: community.general.cloud.lxc.lxc_container
-    lxca_cmms:
-      redirect: community.general.remote_management.lxca.lxca_cmms
-    lxca_nodes:
-      redirect: community.general.remote_management.lxca.lxca_nodes
-    lxd_container:
-      redirect: community.general.cloud.lxd.lxd_container
-    lxd_profile:
-      redirect: community.general.cloud.lxd.lxd_profile
-    lxd_project:
-      redirect: community.general.cloud.lxd.lxd_project
-    macports:
-      redirect: community.general.packaging.os.macports
-    mail:
-      redirect: community.general.notification.mail
-    make:
-      redirect: community.general.system.make
-    manageiq_alert_profiles:
-      redirect: community.general.remote_management.manageiq.manageiq_alert_profiles
-    manageiq_alerts:
-      redirect: community.general.remote_management.manageiq.manageiq_alerts
-    manageiq_group:
-      redirect: community.general.remote_management.manageiq.manageiq_group
-    manageiq_policies:
-      redirect: community.general.remote_management.manageiq.manageiq_policies
-    manageiq_provider:
-      redirect: community.general.remote_management.manageiq.manageiq_provider
-    manageiq_tags:
-      redirect: community.general.remote_management.manageiq.manageiq_tags
-    manageiq_tenant:
-      redirect: community.general.remote_management.manageiq.manageiq_tenant
-    manageiq_user:
-      redirect: community.general.remote_management.manageiq.manageiq_user
-    mas:
-      redirect: community.general.packaging.os.mas
-    matrix:
-      redirect: community.general.notification.matrix
-    mattermost:
-      redirect: community.general.notification.mattermost
-    maven_artifact:
-      redirect: community.general.packaging.language.maven_artifact
-    memset_dns_reload:
-      redirect: community.general.cloud.memset.memset_dns_reload
     memset_memstore_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.memset_memstore_info instead.
-    memset_memstore_info:
-      redirect: community.general.cloud.memset.memset_memstore_info
     memset_server_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.memset_server_info instead.
-    memset_server_info:
-      redirect: community.general.cloud.memset.memset_server_info
-    memset_zone:
-      redirect: community.general.cloud.memset.memset_zone
-    memset_zone_domain:
-      redirect: community.general.cloud.memset.memset_zone_domain
-    memset_zone_record:
-      redirect: community.general.cloud.memset.memset_zone_record
-    mksysb:
-      redirect: community.general.system.mksysb
-    modprobe:
-      redirect: community.general.system.modprobe
-    monit:
-      redirect: community.general.monitoring.monit
-    mqtt:
-      redirect: community.general.notification.mqtt
-    mssql_db:
-      redirect: community.general.database.mssql.mssql_db
-    mssql_script:
-      redirect: community.general.database.mssql.mssql_script
     na_cdot_aggregate:
       tombstone:
         removal_version: 2.0.0
@@ -780,205 +815,172 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use netapp.ontap.na_ontap_info instead.
-    nagios:
-      redirect: community.general.monitoring.nagios
-    netcup_dns:
-      redirect: community.general.net_tools.netcup_dns
-    newrelic_deployment:
-      redirect: community.general.monitoring.newrelic_deployment
-    nexmo:
-      redirect: community.general.notification.nexmo
     nginx_status_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.nginx_status_info instead.
-    nginx_status_info:
-      redirect: community.general.web_infrastructure.nginx_status_info
-    nictagadm:
-      redirect: community.general.cloud.smartos.nictagadm
     nios_a_record:
       redirect: infoblox.nios_modules.nios_a_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_a_record to infoblox.nios_modules.nios_a_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_aaaa_record:
       redirect: infoblox.nios_modules.nios_aaaa_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_aaaa_record to infoblox.nios_modules.nios_aaaa_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_cname_record:
       redirect: infoblox.nios_modules.nios_cname_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_cname_record to infoblox.nios_modules.nios_cname_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_dns_view:
       redirect: infoblox.nios_modules.nios_dns_view
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_dns_view to infoblox.nios_modules.nios_dns_view will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_fixed_address:
       redirect: infoblox.nios_modules.nios_fixed_address
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_fixed_address to infoblox.nios_modules.nios_fixed_address will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_host_record:
       redirect: infoblox.nios_modules.nios_host_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_host_record to infoblox.nios_modules.nios_host_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_member:
       redirect: infoblox.nios_modules.nios_member
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_member to infoblox.nios_modules.nios_member will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_mx_record:
       redirect: infoblox.nios_modules.nios_mx_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_mx_record to infoblox.nios_modules.nios_mx_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_naptr_record:
       redirect: infoblox.nios_modules.nios_naptr_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_naptr_record to infoblox.nios_modules.nios_naptr_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_network:
       redirect: infoblox.nios_modules.nios_network
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_network to infoblox.nios_modules.nios_network will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_network_view:
       redirect: infoblox.nios_modules.nios_network_view
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_network_view to infoblox.nios_modules.nios_network_view will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_nsgroup:
       redirect: infoblox.nios_modules.nios_nsgroup
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_nsgroup to infoblox.nios_modules.nios_nsgroup will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_ptr_record:
       redirect: infoblox.nios_modules.nios_ptr_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_ptr_record to infoblox.nios_modules.nios_ptr_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_srv_record:
       redirect: infoblox.nios_modules.nios_srv_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_srv_record to infoblox.nios_modules.nios_srv_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_txt_record:
       redirect: infoblox.nios_modules.nios_txt_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_txt_record to infoblox.nios_modules.nios_txt_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_zone:
       redirect: infoblox.nios_modules.nios_zone
-    nmcli:
-      redirect: community.general.net_tools.nmcli
-    nomad_job:
-      redirect: community.general.clustering.nomad.nomad_job
-    nomad_job_info:
-      redirect: community.general.clustering.nomad.nomad_job_info
-    nosh:
-      redirect: community.general.system.nosh
-    notification.cisco_spark:
-      redirect: community.general.notification.cisco_webex
-    npm:
-      redirect: community.general.packaging.language.npm
-    nsupdate:
-      redirect: community.general.net_tools.nsupdate
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_zone to infoblox.nios_modules.nios_zone will be removed in community.general 18.0.0. Please update your roles/playbooks.
     oci_vcn:
-      redirect: community.general.cloud.oracle.oci_vcn
-    odbc:
-      redirect: community.general.database.misc.odbc
-    office_365_connector_card:
-      redirect: community.general.notification.office_365_connector_card
-    ohai:
-      redirect: community.general.system.ohai
-    omapi_host:
-      redirect: community.general.net_tools.omapi_host
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Use oracle.oci.oci_network_vcn instead.
     ome_device_info:
       redirect: dellemc.openmanage.ome_device_info
-    one_host:
-      redirect: community.general.cloud.opennebula.one_host
-    one_image:
-      redirect: community.general.cloud.opennebula.one_image
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.ome_device_info to dellemc.openmanage.ome_device_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     one_image_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.one_image_info instead.
-    one_image_info:
-      redirect: community.general.cloud.opennebula.one_image_info
-    one_service:
-      redirect: community.general.cloud.opennebula.one_service
-    one_template:
-      redirect: community.general.cloud.opennebula.one_template
-    one_vm:
-      redirect: community.general.cloud.opennebula.one_vm
     oneandone_firewall_policy:
-      redirect: community.general.cloud.oneandone.oneandone_firewall_policy
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_load_balancer:
-      redirect: community.general.cloud.oneandone.oneandone_load_balancer
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_monitoring_policy:
-      redirect: community.general.cloud.oneandone.oneandone_monitoring_policy
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_private_network:
-      redirect: community.general.cloud.oneandone.oneandone_private_network
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_public_ip:
-      redirect: community.general.cloud.oneandone.oneandone_public_ip
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     oneandone_server:
-      redirect: community.general.cloud.oneandone.oneandone_server
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     onepassword_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.onepassword_info instead.
-    onepassword_info:
-      redirect: community.general.identity.onepassword_info
     oneview_datacenter_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_datacenter_info instead.
-    oneview_datacenter_info:
-      redirect: community.general.remote_management.oneview.oneview_datacenter_info
     oneview_enclosure_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_enclosure_info instead.
-    oneview_enclosure_info:
-      redirect: community.general.remote_management.oneview.oneview_enclosure_info
-    oneview_ethernet_network:
-      redirect: community.general.remote_management.oneview.oneview_ethernet_network
     oneview_ethernet_network_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_ethernet_network_info instead.
-    oneview_ethernet_network_info:
-      redirect: community.general.remote_management.oneview.oneview_ethernet_network_info
-    oneview_fc_network:
-      redirect: community.general.remote_management.oneview.oneview_fc_network
     oneview_fc_network_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_fc_network_info instead.
-    oneview_fc_network_info:
-      redirect: community.general.remote_management.oneview.oneview_fc_network_info
-    oneview_fcoe_network:
-      redirect: community.general.remote_management.oneview.oneview_fcoe_network
     oneview_fcoe_network_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_fcoe_network_info instead.
-    oneview_fcoe_network_info:
-      redirect: community.general.remote_management.oneview.oneview_fcoe_network_info
-    oneview_logical_interconnect_group:
-      redirect: community.general.remote_management.oneview.oneview_logical_interconnect_group
     oneview_logical_interconnect_group_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_logical_interconnect_group_info
           instead.
-    oneview_logical_interconnect_group_info:
-      redirect: community.general.remote_management.oneview.oneview_logical_interconnect_group_info
-    oneview_network_set:
-      redirect: community.general.remote_management.oneview.oneview_network_set
     oneview_network_set_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_network_set_info instead.
-    oneview_network_set_info:
-      redirect: community.general.remote_management.oneview.oneview_network_set_info
-    oneview_san_manager:
-      redirect: community.general.remote_management.oneview.oneview_san_manager
     oneview_san_manager_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_san_manager_info instead.
-    oneview_san_manager_info:
-      redirect: community.general.remote_management.oneview.oneview_san_manager_info
     online_server_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.online_server_info instead.
-    online_server_info:
-      redirect: community.general.cloud.online.online_server_info
     online_user_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.online_user_info instead.
-    online_user_info:
-      redirect: community.general.cloud.online.online_user_info
-    open_iscsi:
-      redirect: community.general.system.open_iscsi
-    openbsd_pkg:
-      redirect: community.general.packaging.os.openbsd_pkg
-    opendj_backendprop:
-      redirect: community.general.identity.opendj.opendj_backendprop
-    openwrt_init:
-      redirect: community.general.system.openwrt_init
-    opkg:
-      redirect: community.general.packaging.os.opkg
-    osx_defaults:
-      redirect: community.general.system.osx_defaults
-    ovh_ip_failover:
-      redirect: community.general.cloud.ovh.ovh_ip_failover
-    ovh_ip_loadbalancing_backend:
-      redirect: community.general.cloud.ovh.ovh_ip_loadbalancing_backend
-    ovh_monthly_billing:
-      redirect: community.general.cloud.ovh.ovh_monthly_billing
     ovirt:
       tombstone:
         removal_version: 3.0.0
@@ -1079,152 +1081,226 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_vmpool_info instead.
-    pacemaker_cluster:
-      redirect: community.general.clustering.pacemaker_cluster
-    packet_device:
-      redirect: community.general.cloud.packet.packet_device
-    packet_ip_subnet:
-      redirect: community.general.cloud.packet.packet_ip_subnet
-    packet_project:
-      redirect: community.general.cloud.packet.packet_project
-    packet_sshkey:
-      redirect: community.general.cloud.packet.packet_sshkey
-    packet_volume:
-      redirect: community.general.cloud.packet.packet_volume
-    packet_volume_attachment:
-      redirect: community.general.cloud.packet.packet_volume_attachment
-    pacman:
-      redirect: community.general.packaging.os.pacman
-    pacman_key:
-      redirect: community.general.packaging.os.pacman_key
-    pagerduty:
-      redirect: community.general.monitoring.pagerduty
-    pagerduty_alert:
-      redirect: community.general.monitoring.pagerduty_alert
-    pagerduty_change:
-      redirect: community.general.monitoring.pagerduty_change
-    pagerduty_user:
-      redirect: community.general.monitoring.pagerduty_user
-    pam_limits:
-      redirect: community.general.system.pam_limits
-    pamd:
-      redirect: community.general.system.pamd
-    parted:
-      redirect: community.general.system.parted
-    pear:
-      redirect: community.general.packaging.language.pear
-    pids:
-      redirect: community.general.system.pids
-    pingdom:
-      redirect: community.general.monitoring.pingdom
-    pip_package_info:
-      redirect: community.general.packaging.language.pip_package_info
-    pipx:
-      redirect: community.general.packaging.language.pipx
-    pkg5:
-      redirect: community.general.packaging.os.pkg5
-    pkg5_publisher:
-      redirect: community.general.packaging.os.pkg5_publisher
-    pkgin:
-      redirect: community.general.packaging.os.pkgin
-    pkgng:
-      redirect: community.general.packaging.os.pkgng
-    pkgutil:
-      redirect: community.general.packaging.os.pkgutil
-    pmem:
-      redirect: community.general.storage.pmem.pmem
-    portage:
-      redirect: community.general.packaging.os.portage
-    portinstall:
-      redirect: community.general.packaging.os.portinstall
     postgresql_copy:
       redirect: community.postgresql.postgresql_copy
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_copy to community.postgresql.postgresql_copy will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_db:
       redirect: community.postgresql.postgresql_db
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_db to community.postgresql.postgresql_db will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_ext:
       redirect: community.postgresql.postgresql_ext
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_ext to community.postgresql.postgresql_ext will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_idx:
       redirect: community.postgresql.postgresql_idx
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_idx to community.postgresql.postgresql_idx will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_info:
       redirect: community.postgresql.postgresql_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_info to community.postgresql.postgresql_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_lang:
       redirect: community.postgresql.postgresql_lang
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_lang to community.postgresql.postgresql_lang will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_membership:
       redirect: community.postgresql.postgresql_membership
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_membership to community.postgresql.postgresql_membership will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_owner:
       redirect: community.postgresql.postgresql_owner
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_owner to community.postgresql.postgresql_owner will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_pg_hba:
       redirect: community.postgresql.postgresql_pg_hba
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_pg_hba to community.postgresql.postgresql_pg_hba will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_ping:
       redirect: community.postgresql.postgresql_ping
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_ping to community.postgresql.postgresql_ping will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_privs:
       redirect: community.postgresql.postgresql_privs
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_privs to community.postgresql.postgresql_privs will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_publication:
       redirect: community.postgresql.postgresql_publication
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_publication to community.postgresql.postgresql_publication will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_query:
       redirect: community.postgresql.postgresql_query
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_query to community.postgresql.postgresql_query will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_schema:
       redirect: community.postgresql.postgresql_schema
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_schema to community.postgresql.postgresql_schema will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_sequence:
       redirect: community.postgresql.postgresql_sequence
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_sequence to community.postgresql.postgresql_sequence will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_set:
       redirect: community.postgresql.postgresql_set
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_set to community.postgresql.postgresql_set will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_slot:
       redirect: community.postgresql.postgresql_slot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_slot to community.postgresql.postgresql_slot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_subscription:
       redirect: community.postgresql.postgresql_subscription
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_subscription to community.postgresql.postgresql_subscription will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_table:
       redirect: community.postgresql.postgresql_table
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_table to community.postgresql.postgresql_table will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_tablespace:
       redirect: community.postgresql.postgresql_tablespace
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_tablespace to community.postgresql.postgresql_tablespace will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_user:
       redirect: community.postgresql.postgresql_user
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_user to community.postgresql.postgresql_user will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_user_obj_stat_info:
       redirect: community.postgresql.postgresql_user_obj_stat_info
-    pritunl_org:
-      redirect: community.general.net_tools.pritunl.pritunl_org
-    pritunl_org_info:
-      redirect: community.general.net_tools.pritunl.pritunl_org_info
-    pritunl_user:
-      redirect: community.general.net_tools.pritunl.pritunl_user
-    pritunl_user_info:
-      redirect: community.general.net_tools.pritunl.pritunl_user_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_user_obj_stat_info to community.postgresql.postgresql_user_obj_stat_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     profitbricks:
-      redirect: community.general.cloud.profitbricks.profitbricks
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
     profitbricks_datacenter:
-      redirect: community.general.cloud.profitbricks.profitbricks_datacenter
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
     profitbricks_nic:
-      redirect: community.general.cloud.profitbricks.profitbricks_nic
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
     profitbricks_volume:
-      redirect: community.general.cloud.profitbricks.profitbricks_volume
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
     profitbricks_volume_attachments:
-      redirect: community.general.cloud.profitbricks.profitbricks_volume_attachments
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
     proxmox:
-      redirect: community.general.cloud.misc.proxmox
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_backup:
+      redirect: community.proxmox.proxmox_backup
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_backup_info:
+      redirect: community.proxmox.proxmox_backup_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_disk:
+      redirect: community.proxmox.proxmox_disk
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_domain_info:
-      redirect: community.general.cloud.misc.proxmox_domain_info
+      redirect: community.proxmox.proxmox_domain_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_group_info:
-      redirect: community.general.cloud.misc.proxmox_group_info
+      redirect: community.proxmox.proxmox_group_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_kvm:
-      redirect: community.general.cloud.misc.proxmox_kvm
+      redirect: community.proxmox.proxmox_kvm
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_nic:
-      redirect: community.general.cloud.misc.proxmox_nic
+      redirect: community.proxmox.proxmox_nic
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_node_info:
+      redirect: community.proxmox.proxmox_node_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_pool:
+      redirect: community.proxmox.proxmox_pool
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_pool_member:
+      redirect: community.proxmox.proxmox_pool_member
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_snap:
-      redirect: community.general.cloud.misc.proxmox_snap
+      redirect: community.proxmox.proxmox_snap
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_storage_contents_info:
+      redirect: community.proxmox.proxmox_storage_contents_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_storage_info:
-      redirect: community.general.cloud.misc.proxmox_storage_info
+      redirect: community.proxmox.proxmox_storage_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_tasks_info:
-      redirect: community.general.cloud.misc.proxmox_tasks_info
+      redirect: community.proxmox.proxmox_tasks_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_template:
-      redirect: community.general.cloud.misc.proxmox_template
+      redirect: community.proxmox.proxmox_template
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     proxmox_user_info:
-      redirect: community.general.cloud.misc.proxmox_user_info
-    pubnub_blocks:
-      redirect: community.general.cloud.pubnub.pubnub_blocks
-    pulp_repo:
-      redirect: community.general.packaging.os.pulp_repo
-    puppet:
-      redirect: community.general.system.puppet
+      redirect: community.proxmox.proxmox_user_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_vm_info:
+      redirect: community.proxmox.proxmox_vm_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     purefa_facts:
       tombstone:
         removal_version: 3.0.0
@@ -1234,209 +1310,187 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use purestorage.flashblade.purefb_info instead.
     pushbullet:
-      redirect: community.general.notification.pushbullet
-    pushover:
-      redirect: community.general.notification.pushover
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Module relies on Python package pushbullet.py which is not maintained and supports only up to Python 3.2.
     python_requirements_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.python_requirements_info instead.
-    python_requirements_info:
-      redirect: community.general.system.python_requirements_info
-    rax:
-      redirect: community.general.cloud.rackspace.rax
-    rax_cbs:
-      redirect: community.general.cloud.rackspace.rax_cbs
     rax_cbs_attachments:
-      redirect: community.general.cloud.rackspace.rax_cbs_attachments
-    rax_cdb:
-      redirect: community.general.cloud.rackspace.rax_cdb
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax_cbs:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_cdb_database:
-      redirect: community.general.cloud.rackspace.rax_cdb_database
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_cdb_user:
-      redirect: community.general.cloud.rackspace.rax_cdb_user
-    rax_clb:
-      redirect: community.general.cloud.rackspace.rax_clb
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax_cdb:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_clb_nodes:
-      redirect: community.general.cloud.rackspace.rax_clb_nodes
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_clb_ssl:
-      redirect: community.general.cloud.rackspace.rax_clb_ssl
-    rax_dns:
-      redirect: community.general.cloud.rackspace.rax_dns
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax_clb:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_dns_record:
-      redirect: community.general.cloud.rackspace.rax_dns_record
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax_dns:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_facts:
-      redirect: community.general.cloud.rackspace.rax_facts
-    rax_files:
-      redirect: community.general.cloud.rackspace.rax_files
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_files_objects:
-      redirect: community.general.cloud.rackspace.rax_files_objects
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax_files:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_identity:
-      redirect: community.general.cloud.rackspace.rax_identity
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_keypair:
-      redirect: community.general.cloud.rackspace.rax_keypair
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_meta:
-      redirect: community.general.cloud.rackspace.rax_meta
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_alarm:
-      redirect: community.general.cloud.rackspace.rax_mon_alarm
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_check:
-      redirect: community.general.cloud.rackspace.rax_mon_check
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_entity:
-      redirect: community.general.cloud.rackspace.rax_mon_entity
-    rax_mon_notification:
-      redirect: community.general.cloud.rackspace.rax_mon_notification
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_notification_plan:
-      redirect: community.general.cloud.rackspace.rax_mon_notification_plan
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
+    rax_mon_notification:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_network:
-      redirect: community.general.cloud.rackspace.rax_network
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_queue:
-      redirect: community.general.cloud.rackspace.rax_queue
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_scaling_group:
-      redirect: community.general.cloud.rackspace.rax_scaling_group
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     rax_scaling_policy:
-      redirect: community.general.cloud.rackspace.rax_scaling_policy
-    read_csv:
-      redirect: community.general.files.read_csv
-    redfish_command:
-      redirect: community.general.remote_management.redfish.redfish_command
-    redfish_config:
-      redirect: community.general.remote_management.redfish.redfish_config
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on the deprecated package pyrax.
     redfish_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.redfish_info instead.
-    redfish_info:
-      redirect: community.general.remote_management.redfish.redfish_info
-    redhat_subscription:
-      redirect: community.general.packaging.os.redhat_subscription
-    redis:
-      redirect: community.general.database.misc.redis
-    redis_data:
-      redirect: community.general.database.misc.redis_data
-    redis_data_incr:
-      redirect: community.general.database.misc.redis_data_incr
-    redis_data_info:
-      redirect: community.general.database.misc.redis_data_info
-    redis_info:
-      redirect: community.general.database.misc.redis_info
-    rhevm:
-      redirect: community.general.cloud.misc.rhevm
     rhn_channel:
-      redirect: community.general.packaging.os.rhn_channel
+      tombstone:
+        removal_version: 10.0.0
+        warning_text: RHN is EOL.
     rhn_register:
-      redirect: community.general.packaging.os.rhn_register
-    rhsm_release:
-      redirect: community.general.packaging.os.rhsm_release
-    rhsm_repository:
-      redirect: community.general.packaging.os.rhsm_repository
-    riak:
-      redirect: community.general.database.misc.riak
-    rocketchat:
-      redirect: community.general.notification.rocketchat
-    rollbar_deployment:
-      redirect: community.general.monitoring.rollbar_deployment
-    rpm_ostree_pkg:
-      redirect: community.general.packaging.os.rpm_ostree_pkg
-    rundeck_acl_policy:
-      redirect: community.general.web_infrastructure.rundeck_acl_policy
-    rundeck_job_executions_info:
-      redirect: community.general.web_infrastructure.rundeck_job_executions_info
-    rundeck_job_run:
-      redirect: community.general.web_infrastructure.rundeck_job_run
-    rundeck_project:
-      redirect: community.general.web_infrastructure.rundeck_project
-    runit:
-      redirect: community.general.system.runit
-    sap_task_list_execute:
-      redirect: community.general.system.sap_task_list_execute
+      tombstone:
+        removal_version: 10.0.0
+        warning_text: RHN is EOL.
     sapcar_extract:
-      redirect: community.general.files.sapcar_extract
-    say:
-      redirect: community.general.notification.say
-    scaleway_compute:
-      redirect: community.general.cloud.scaleway.scaleway_compute
-    scaleway_database_backup:
-      redirect: community.general.cloud.scaleway.scaleway_database_backup
+      redirect: community.sap_libs.sapcar_extract
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.sapcar_extract to community.sap_libs.sapcar_extract will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    sap_task_list_execute:
+      redirect: community.sap_libs.sap_task_list_execute
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.sap_task_list_execute to community.sap_libs.sap_task_list_execute will be removed in community.general 18.0.0. Please update your roles/playbooks.
     scaleway_image_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_image_info instead.
-    scaleway_image_info:
-      redirect: community.general.cloud.scaleway.scaleway_image_info
-    scaleway_ip:
-      redirect: community.general.cloud.scaleway.scaleway_ip
     scaleway_ip_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_ip_info instead.
-    scaleway_ip_info:
-      redirect: community.general.cloud.scaleway.scaleway_ip_info
-    scaleway_lb:
-      redirect: community.general.cloud.scaleway.scaleway_lb
     scaleway_organization_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_organization_info instead.
-    scaleway_organization_info:
-      redirect: community.general.cloud.scaleway.scaleway_organization_info
-    scaleway_private_network:
-      redirect: community.general.cloud.scaleway.scaleway_private_network
-    scaleway_security_group:
-      redirect: community.general.cloud.scaleway.scaleway_security_group
     scaleway_security_group_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_security_group_info instead.
-    scaleway_security_group_info:
-      redirect: community.general.cloud.scaleway.scaleway_security_group_info
-    scaleway_security_group_rule:
-      redirect: community.general.cloud.scaleway.scaleway_security_group_rule
     scaleway_server_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_server_info instead.
-    scaleway_server_info:
-      redirect: community.general.cloud.scaleway.scaleway_server_info
     scaleway_snapshot_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_snapshot_info instead.
-    scaleway_snapshot_info:
-      redirect: community.general.cloud.scaleway.scaleway_snapshot_info
-    scaleway_sshkey:
-      redirect: community.general.cloud.scaleway.scaleway_sshkey
-    scaleway_user_data:
-      redirect: community.general.cloud.scaleway.scaleway_user_data
-    scaleway_volume:
-      redirect: community.general.cloud.scaleway.scaleway_volume
     scaleway_volume_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_volume_info instead.
-    scaleway_volume_info:
-      redirect: community.general.cloud.scaleway.scaleway_volume_info
-    sefcontext:
-      redirect: community.general.system.sefcontext
-    selinux_permissive:
-      redirect: community.general.system.selinux_permissive
-    selogin:
-      redirect: community.general.system.selogin
-    sendgrid:
-      redirect: community.general.notification.sendgrid
     sensu_check:
-      redirect: community.general.monitoring.sensu.sensu_check
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_client:
-      redirect: community.general.monitoring.sensu.sensu_client
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_handler:
-      redirect: community.general.monitoring.sensu.sensu_handler
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_silence:
-      redirect: community.general.monitoring.sensu.sensu_silence
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sensu_subscription:
-      redirect: community.general.monitoring.sensu.sensu_subscription
-    seport:
-      redirect: community.general.system.seport
-    serverless:
-      redirect: community.general.cloud.misc.serverless
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     sf_account_manager:
       tombstone:
         removal_version: 2.0.0
@@ -1457,263 +1511,273 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use netapp.elementsw.na_elementsw_volume instead.
-    shutdown:
-      redirect: community.general.system.shutdown
-    sl_vm:
-      redirect: community.general.cloud.softlayer.sl_vm
-    slack:
-      redirect: community.general.notification.slack
-    slackpkg:
-      redirect: community.general.packaging.os.slackpkg
     smartos_image_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.smartos_image_info instead.
-    smartos_image_info:
-      redirect: community.general.cloud.smartos.smartos_image_info
-    snap:
-      redirect: community.general.packaging.os.snap
-    snap_alias:
-      redirect: community.general.packaging.os.snap_alias
-    snmp_facts:
-      redirect: community.general.net_tools.snmp_facts
-    solaris_zone:
-      redirect: community.general.system.solaris_zone
-    sorcery:
-      redirect: community.general.packaging.os.sorcery
-    spectrum_device:
-      redirect: community.general.monitoring.spectrum_device
-    spectrum_model_attrs:
-      redirect: community.general.monitoring.spectrum_model_attrs
     spotinst_aws_elastigroup:
-      redirect: community.general.cloud.spotinst.spotinst_aws_elastigroup
-    ss_3par_cpg:
-      redirect: community.general.storage.hpe3par.ss_3par_cpg
-    ssh_config:
-      redirect: community.general.system.ssh_config
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Module relies on unsupported Python package. Use the module spot.cloud_modules.aws_elastigroup instead.
     stackdriver:
-      redirect: community.general.monitoring.stackdriver
-    stacki_host:
-      redirect: community.general.remote_management.stacki.stacki_host
-    statsd:
-      redirect: community.general.monitoring.statsd
-    statusio_maintenance:
-      redirect: community.general.monitoring.statusio_maintenance
-    sudoers:
-      redirect: community.general.system.sudoers
-    supervisorctl:
-      redirect: community.general.web_infrastructure.supervisorctl
-    svc:
-      redirect: community.general.system.svc
-    svr4pkg:
-      redirect: community.general.packaging.os.svr4pkg
-    swdepot:
-      redirect: community.general.packaging.os.swdepot
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore,
+          and any new development in the direction of providing an alternative should
+          happen in the context of the google.cloud collection.
     swupd:
-      redirect: community.general.packaging.os.swupd
-    syslogger:
-      redirect: community.general.notification.syslogger
-    syspatch:
-      redirect: community.general.system.syspatch
-    sysrc:
-      redirect: community.general.system.sysrc
-    sysupgrade:
-      redirect: community.general.system.sysupgrade
-    taiga_issue:
-      redirect: community.general.web_infrastructure.taiga_issue
-    telegram:
-      redirect: community.general.notification.telegram
-    terraform:
-      redirect: community.general.cloud.misc.terraform
-    timezone:
-      redirect: community.general.system.timezone
-    twilio:
-      redirect: community.general.notification.twilio
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: ClearLinux was made EOL in July 2025. If you think the module is still useful for another distribution, please create an issue in the community.general repository.
     typetalk:
-      redirect: community.general.notification.typetalk
-    udm_dns_record:
-      redirect: community.general.cloud.univention.udm_dns_record
-    udm_dns_zone:
-      redirect: community.general.cloud.univention.udm_dns_zone
-    udm_group:
-      redirect: community.general.cloud.univention.udm_group
-    udm_share:
-      redirect: community.general.cloud.univention.udm_share
-    udm_user:
-      redirect: community.general.cloud.univention.udm_user
-    ufw:
-      redirect: community.general.system.ufw
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: The typetalk service will be discontinued on Dec 2025.
     uptimerobot:
-      redirect: community.general.monitoring.uptimerobot
-    urpmi:
-      redirect: community.general.packaging.os.urpmi
-    utm_aaa_group:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_aaa_group
-    utm_aaa_group_info:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_aaa_group_info
-    utm_ca_host_key_cert:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_ca_host_key_cert
-    utm_ca_host_key_cert_info:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_ca_host_key_cert_info
-    utm_dns_host:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_dns_host
-    utm_network_interface_address:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_network_interface_address
-    utm_network_interface_address_info:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_network_interface_address_info
-    utm_proxy_auth_profile:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_auth_profile
-    utm_proxy_exception:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_exception
-    utm_proxy_frontend:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_frontend
-    utm_proxy_frontend_info:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_frontend_info
-    utm_proxy_location:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_location
-    utm_proxy_location_info:
-      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_location_info
-    vdo:
-      redirect: community.general.system.vdo
-    vertica_configuration:
-      redirect: community.general.database.vertica.vertica_configuration
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The module uses the Uptime Robot API v1, which was retired and is no longer available. Use the Uptime Robot API v3 directly with the ansible.builtin.uri module.
     vertica_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.vertica_info instead.
-    vertica_info:
-      redirect: community.general.database.vertica.vertica_info
-    vertica_role:
-      redirect: community.general.database.vertica.vertica_role
-    vertica_schema:
-      redirect: community.general.database.vertica.vertica_schema
-    vertica_user:
-      redirect: community.general.database.vertica.vertica_user
-    vexata_eg:
-      redirect: community.general.storage.vexata.vexata_eg
-    vexata_volume:
-      redirect: community.general.storage.vexata.vexata_volume
-    vmadm:
-      redirect: community.general.cloud.smartos.vmadm
-    wakeonlan:
-      redirect: community.general.remote_management.wakeonlan
     webfaction_app:
-      redirect: community.general.cloud.webfaction.webfaction_app
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     webfaction_db:
-      redirect: community.general.cloud.webfaction.webfaction_db
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     webfaction_domain:
-      redirect: community.general.cloud.webfaction.webfaction_domain
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     webfaction_mailbox:
-      redirect: community.general.cloud.webfaction.webfaction_mailbox
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     webfaction_site:
-      redirect: community.general.cloud.webfaction.webfaction_site
-    xattr:
-      redirect: community.general.files.xattr
-    xbps:
-      redirect: community.general.packaging.os.xbps
-    xcc_redfish_command:
-      redirect: community.general.remote_management.lenovoxcc.xcc_redfish_command
-    xenserver_facts:
-      redirect: community.general.cloud.misc.xenserver_facts
-    xenserver_guest:
-      redirect: community.general.cloud.xenserver.xenserver_guest
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     xenserver_guest_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.xenserver_guest_info instead.
-    xenserver_guest_info:
-      redirect: community.general.cloud.xenserver.xenserver_guest_info
-    xenserver_guest_powerstate:
-      redirect: community.general.cloud.xenserver.xenserver_guest_powerstate
-    xfconf:
-      redirect: community.general.system.xfconf
-    xfconf_info:
-      redirect: community.general.system.xfconf_info
-    xfs_quota:
-      redirect: community.general.system.xfs_quota
-    xml:
-      redirect: community.general.files.xml
-    yarn:
-      redirect: community.general.packaging.language.yarn
     yum_versionlock:
-      redirect: community.general.packaging.os.yum_versionlock
-    zfs:
-      redirect: community.general.storage.zfs.zfs
-    zfs_delegate_admin:
-      redirect: community.general.storage.zfs.zfs_delegate_admin
-    zfs_facts:
-      redirect: community.general.storage.zfs.zfs_facts
-    znode:
-      redirect: community.general.clustering.znode
-    zpool_facts:
-      redirect: community.general.storage.zfs.zpool_facts
-    zypper:
-      redirect: community.general.packaging.os.zypper
-    zypper_repository:
-      redirect: community.general.packaging.os.zypper_repository
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: Use community.general.dnf_versionlock instead.
   doc_fragments:
     _gcp:
       redirect: community.google._gcp
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general._gcp to community.google._gcp will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    dimensiondata:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
+    dimensiondata_wait:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     docker:
       redirect: community.docker.docker
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker to community.docker.docker will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner:
       redirect: community.hrobot.robot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner to community.hrobot.robot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_common_options:
       redirect: community.kubevirt.kubevirt_common_options
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_common_options to community.kubevirt.kubevirt_common_options will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_vm_options:
       redirect: community.kubevirt.kubevirt_vm_options
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_vm_options to community.kubevirt.kubevirt_vm_options will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios:
       redirect: infoblox.nios_modules.nios
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios to infoblox.nios_modules.nios will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    oracle:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_creatable_resource:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_display_name_option:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_name_option:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_tags:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_wait_options:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     postgresql:
       redirect: community.postgresql.postgresql
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql to community.postgresql.postgresql will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    purestorage:
+      tombstone:
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this document fragment was left behind.
+    rackspace:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This doc fragment was used by rax modules, that relied on the deprecated
+          package pyrax.
   module_utils:
+    cloud:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
+    database:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
+    dimensiondata:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Service and its endpoints are no longer available.
     docker.common:
       redirect: community.docker.common
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker.common to community.docker.common will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker.swarm:
       redirect: community.docker.swarm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker.swarm to community.docker.swarm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcdns:
       redirect: community.google.gcdns
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcdns to community.google.gcdns will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce:
       redirect: community.google.gce
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce to community.google.gce will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcp:
       redirect: community.google.gcp
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcp to community.google.gcp will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner:
       redirect: community.hrobot.robot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner to community.hrobot.robot will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    known_hosts:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     kubevirt:
       redirect: community.kubevirt.kubevirt
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt to community.kubevirt.kubevirt will be removed in community.general 18.0.0. Please update your roles/playbooks.
     net_tools.nios.api:
       redirect: infoblox.nios_modules.api
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.net_tools.nios.api to infoblox.nios_modules.api will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    oracle.oci_utils:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oneandone:
+      tombstone:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module.
     postgresql:
       redirect: community.postgresql.postgresql
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql to community.postgresql.postgresql will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    pure:
+      tombstone:
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this module util was left behind.
+    rax:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module util relied on the deprecated package pyrax.
     remote_management.dellemc.dellemc_idrac:
       redirect: dellemc.openmanage.dellemc_idrac
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.remote_management.dellemc.dellemc_idrac to dellemc.openmanage.dellemc_idrac will be removed in community.general 18.0.0. Please update your roles/playbooks.
     remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
-  callback:
-    actionable:
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.remote_management.dellemc.ome to dellemc.openmanage.ome will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    saslprep:
       tombstone:
-        removal_version: 2.0.0
-        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts
-          = no' and 'display_ok_hosts = no' options.
-    full_skip:
-      tombstone:
-        removal_version: 2.0.0
-        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts
-          = no' option.
-    osx_say:
-      redirect: community.general.say
-    stderr:
-      tombstone:
-        removal_version: 2.0.0
-        warning_text: Use the 'default' callback plugin with 'display_failed_stderr
-          = yes' option.
+        removal_version: 13.0.0
+        warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
   inventory:
     docker_machine:
       redirect: community.docker.docker_machine
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_machine to community.docker.docker_machine will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm:
       redirect: community.docker.docker_swarm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm to community.docker.docker_swarm will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     kubevirt:
       redirect: community.kubevirt.kubevirt
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt to community.kubevirt.kubevirt will be removed in community.general 18.0.0. Please update your roles/playbooks.
+    stackpath_compute:
+      tombstone:
+        removal_version: 11.0.0
+        warning_text: The company and the service were sunset in June 2024.
   filter:
     path_join:
       # The ansible.builtin.path_join filter has been added in ansible-base 2.10.
@@ -1724,8 +1788,3 @@ plugin_routing:
       # for Ansible 2.9 or earlier. Now we only will have the redirect until we
       # eventually will deprecate and then remove it.
       redirect: ansible.builtin.path_join
-  action:
-    iptables_state:
-      redirect: community.general.system.iptables_state
-    shutdown:
-      redirect: community.general.system.shutdown

@@ -1,7 +1,12 @@
+..
+  Copyright (c) Ansible Project
+  GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+  SPDX-License-Identifier: GPL-3.0-or-later
+
 Working with versions
 ---------------------
 
-If you need to sort a list of version numbers, the Jinja ``sort`` filter is problematic. Since it sorts lexicographically, ``2.10`` will come before ``2.9``. To treat version numbers correctly, you can use the ``version_sort`` filter:
+If you need to sort a list of version numbers, the Jinja ``sort`` filter is problematic. Since it sorts lexicographically, ``2.10`` will come before ``2.9``. To treat version numbers correctly, you can use the :ansplugin:`community.general.version_sort filter <community.general.version_sort#filter>`:
 
 .. code-block:: yaml+jinja
 
@@ -17,6 +22,17 @@ If you need to sort a list of version numbers, the Jinja ``sort`` filter is prob
           - '2.9.0'
 
 This produces:
+
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
 
 .. code-block:: ansible-output
 

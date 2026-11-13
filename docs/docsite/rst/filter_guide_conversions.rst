@@ -1,10 +1,15 @@
+..
+  Copyright (c) Ansible Project
+  GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+  SPDX-License-Identifier: GPL-3.0-or-later
+
 Conversions
 -----------
 
 Parsing CSV files
 ^^^^^^^^^^^^^^^^^
 
-Ansible offers the :ref:`community.general.read_csv module <ansible_collections.community.general.read_csv_module>` to read CSV files. Sometimes you need to convert strings to CSV files instead. For this, the ``from_csv`` filter exists.
+Ansible offers the :ansplugin:`community.general.read_csv module <community.general.read_csv#module>` to read CSV files. Sometimes you need to convert strings to CSV files instead. For this, the :ansplugin:`community.general.from_csv filter <community.general.from_csv#filter>` exists.
 
 .. code-block:: yaml+jinja
 
@@ -18,6 +23,17 @@ Ansible offers the :ref:`community.general.read_csv module <ansible_collections.
           you,this,then
 
 This produces:
+
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
 
 .. code-block:: ansible-output
 
@@ -37,7 +53,7 @@ This produces:
         ]
     }
 
-The ``from_csv`` filter has several keyword arguments to control its behavior:
+The :ansplugin:`community.general.from_csv filter <community.general.from_csv#filter>` has several keyword arguments to control its behavior:
 
 :dialect: Dialect of the CSV file. Default is ``excel``. Other possible choices are ``excel-tab`` and ``unix``. If one of ``delimiter``, ``skipinitialspace`` or ``strict`` is specified, ``dialect`` is ignored.
 :fieldnames: A set of column names to use. If not provided, the first line of the CSV is assumed to contain the column names.
@@ -50,7 +66,7 @@ The ``from_csv`` filter has several keyword arguments to control its behavior:
 Converting to JSON
 ^^^^^^^^^^^^^^^^^^
 
-`JC <https://pypi.org/project/jc/>`_ is a CLI tool and Python library which allows to interpret output of various CLI programs as JSON. It is also available as a filter in community.general. This filter needs the `jc Python library <https://pypi.org/project/jc/>`_ installed on the controller.
+`JC <https://pypi.org/project/jc/>`_ is a CLI tool and Python library which allows to interpret output of various CLI programs as JSON. It is also available as a filter in community.general, called :ansplugin:`community.general.jc#filter`. This filter needs the `jc Python library <https://pypi.org/project/jc/>`_ installed on the controller.
 
 .. code-block:: yaml+jinja
 
@@ -63,6 +79,34 @@ Converting to JSON
         msg: "{{ result.stdout | community.general.jc('ls') }}"
 
 This produces:
+
+.. ansible-output-data::
+
+    skip_first_lines: 3
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - ansible.builtin.set_fact:
+              result_stdout: |-
+                bin
+                boot
+                dev
+                etc
+                home
+                lib
+                proc
+                root
+                run
+                tmp
+
+          - name: Run 'ls' to list files in /
+            command: ls /
+            register: result
+
+          - name: Parse the ls output
+            debug:
+              msg: "{{ result_stdout | community.general.jc('ls') }}"
 
 .. code-block:: ansible-output
 

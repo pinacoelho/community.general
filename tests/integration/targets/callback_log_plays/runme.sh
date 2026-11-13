@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 set -eux
 
-# ANSIBLE_CALLBACK_WHITELIST has been deprecated in ansible-base 2.11, ANSIBLE_CALLBACKS_ENABLED should be used
-export ANSIBLE_CALLBACK_WHITELIST="community.general.log_plays,${ANSIBLE_CALLBACK_WHITELIST:-}"
 export ANSIBLE_CALLBACKS_ENABLED="community.general.log_plays,${ANSIBLE_CALLBACKS_ENABLED:-}"
 
 # run play, should create log and dir if needed
@@ -14,5 +15,12 @@ ansible-playbook ping_log.yml -v "$@"
 # now force it to fail
 export ANSIBLE_LOG_FOLDER="logit.file"
 touch "${ANSIBLE_LOG_FOLDER}"
-ansible-playbook ping_log.yml -v "$@" 2>&1| grep 'Failure using method (v2_runner_on_ok) in callback plugin'
+ansible-playbook ping_log.yml -v "$@" 2>&1| grep -E "(Failure using method \(v2_runner_on_ok\) in callback plugin|Callback dispatch 'v2_runner_on_ok' failed for plugin)"
 [[ ! -f "${ANSIBLE_LOG_FOLDER}/localhost" ]]
+
+# a folder starting with ~ should be expanded
+TEST_HOME="$(mktemp -d)"
+# shellcheck disable=SC2088
+HOME="${TEST_HOME}" ANSIBLE_LOG_FOLDER="~/logit" ansible-playbook ping_log.yml -v "$@"
+[[ -f "${TEST_HOME}/logit/localhost" ]]
+rm -rf "${TEST_HOME}"

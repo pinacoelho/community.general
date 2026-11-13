@@ -1,23 +1,76 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Check name of gpg2 binary
-  command: which gpg2
+  ansible.builtin.command: which gpg2
   register: gpg2_check
   ignore_errors: true
 
 - name: Set gpg2 binary name
-  set_fact:
+  ansible.builtin.set_fact:
     gpg2_bin: '{{ "gpg2" if gpg2_check is successful else "gpg" }}'
 
 - name: Stop gpg-agent so we can remove any locks on the GnuPG dir
-  command: gpgconf --kill gpg-agent
-  ignore_errors: yes
+  ansible.builtin.command: gpgconf --kill gpg-agent
+  ignore_errors: true
 
 - name: Remove previous password files and directory
-  file:
+  ansible.builtin.file:
     dest: "{{ item }}"
     state: absent
   loop:
     - "~/.gnupg"
     - "~/.password-store"
+
+- name: Get path of pass executable
+  ansible.builtin.command: which pass
+  register: result
+
+- name: Store path of pass executable
+  ansible.builtin.set_fact:
+    passpath: "{{ result.stdout }}"
+
+- name: Move original pass into place if there was a leftover
+  ansible.builtin.command:
+    argv:
+      - mv
+      - "{{ passpath }}.testorig"
+      - "{{ passpath }}"
+  args:
+    removes: "{{ passpath }}.testorig"
+
+# having gopass is not required for this test, but we store
+# its path in case it is installed, so we can restore it
+- name: Try to find gopass in path
+  ansible.builtin.command: which gopass
+  register: result
+
+- name: Store path of gopass executable
+  ansible.builtin.set_fact:
+    gopasspath: "{{ result.stdout }}"
+
+- name: Move original gopass into place if there was a leftover
+  ansible.builtin.command:
+    argv:
+      - mv
+      - "{{ gopasspath }}.testorig"
+      - "{{ gopasspath }}"
+  args:
+    removes: "{{ gopasspath }}.testorig"
+
+- name: Get versions of tools
+  ansible.builtin.command: "{{ item }} --version"
+  register: versions
+  loop:
+    - "{{ gpg2_bin }}"
+    - pass
+    - gopass
+
+- name: Output versions of tools
+  ansible.builtin.debug:
+    msg: "{{ versions.results | map(attribute='stdout_lines') }}"
 
 # How to generate a new GPG key:
 #   gpg2 --batch --gen-key input  # See templates/input
@@ -27,127 +80,194 @@
 #   gpg2 --fingerprint --keyid-format LONG | grep [key id] -A 1 | tail -1 | tr -d '[:space:]' | awk -F '=' '{print $2":6:"}'
 
 - name: Import GPG private key
-  shell: echo "{{ passwordstore_privkey }}" | {{ gpg2_bin }} --import --allow-secret-key-import -
+  ansible.builtin.shell: echo "{{ passwordstore_privkey }}" | {{ gpg2_bin }} --import --allow-secret-key-import -
 
 - name: Trust  key
-  shell: echo "D3E1CC8934E97270CEB066023AF1BD3619AB496A:6:" | {{ gpg2_bin }} --import-ownertrust
+  ansible.builtin.shell: echo "D3E1CC8934E97270CEB066023AF1BD3619AB496A:6:" | {{ gpg2_bin }} --import-ownertrust
 
-- name: Initialise passwordstore
-  command: pass init ansible-test
+- name: Initialise pass passwordstore
+  ansible.builtin.command: pass init ansible-test
 
-- name: Create a password
-  set_fact:
-    newpass: "{{ lookup('community.general.passwordstore', 'test-pass length=8 create=yes') }}"
+- name: Initialise gopass passwordstore
+  ansible.builtin.command: gopass init --path $HOME/.gopass-store ansible-test
+  args:
+    creates: "{{ lookup('env','HOME') }}/.gopass-store"
 
-- name: Fetch password from an existing file
-  set_fact:
-    readpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+# these tests should apply to all backends
+- name: Password tests
+  ansible.builtin.include_tasks: password_tests.yml
+  loop:
+    - pass
+    - gopass
+  loop_control:
+    loop_var: backend
 
-- name: Verify password
-  assert:
+- name: Initialise gopass mounted store
+  ansible.builtin.command: gopass init --store mnt --path $HOME/.gopass-mnt-store ansible-test
+  args:
+    creates: "{{ lookup('env','HOME') }}/.gopass-mnt-store"
+
+- name: Create a password in the gopass mount
+  ansible.builtin.set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'mnt/test-pass', length=8, create=true, backend='gopass') }}"
+
+- name: Fetch password from the gopass mount
+  ansible.builtin.set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'mnt/test-pass', backend='gopass') }}"
+
+- name: Verify password from the gopass mount
+  ansible.builtin.assert:
     that:
       - readpass == newpass
 
-- name: Create a password with equal sign
-  set_fact:
-    newpass: "{{ lookup('community.general.passwordstore', 'test-pass-equal userpass=SimpleSample= create=yes') }}"
+- name: Try to read the gopass mount as passname
+  ansible.builtin.set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'mnt', backend='gopass') }}"
+  ignore_errors: true
+  register: mount_as_passname
 
-- name: Fetch a password with equal sign
-  set_fact:
-    readpass: "{{ lookup('community.general.passwordstore', 'test-pass-equal') }}"
-
-- name: Verify password
-  assert:
+- name: Make sure reading the gopass mount as passname failed
+  ansible.builtin.assert:
     that:
-      - readpass == newpass
+      - mount_as_passname is failed
+      - '"passname mnt not found" in mount_as_passname.msg'
 
-- name: Create a password using missing=create
-  set_fact:
-    newpass: "{{ lookup('community.general.passwordstore', 'test-missing-create missing=create length=8') }}"
+- name: Change passwordstore location explicitly
+  ansible.builtin.set_fact:
+    passwordstore: "{{ lookup('env','HOME') }}/.password-store"
 
-- name: Fetch password from an existing file
-  set_fact:
-    readpass: "{{ lookup('community.general.passwordstore', 'test-missing-create') }}"
+- name: Make sure password store still works with explicit location set
+  ansible.builtin.set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
 
-- name: Verify password
-  assert:
+- name: Change passwordstore location to a non-existent place
+  ansible.builtin.set_fact:
+    passwordstore: "somenonexistentplace"
+
+- name: Try reading from non-existent passwordstore location
+  ansible.builtin.set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+  ignore_errors: true
+  register: eval_error
+
+- name: Make sure reading from non-existent passwordstore location failed
+  ansible.builtin.assert:
     that:
-      - readpass == newpass
+      - eval_error is failed
+      - >-
+        "Passwordstore directory '" in eval_error.msg
+      - >-
+        "/somenonexistentplace' does not exist" in eval_error.msg
 
-- name: Fetch password from existing file using missing=empty
-  set_fact:
-    readpass: "{{ lookup('community.general.passwordstore', 'test-missing-create missing=empty') }}"
+- name: Test pass compatibility shim detection
+  block:
+    - name: Move original pass out of the way
+      ansible.builtin.command:
+        argv:
+          - mv
+          - "{{ passpath }}"
+          - "{{ passpath }}.testorig"
+      args:
+        creates: "{{ passpath }}.testorig"
 
-- name: Verify password
-  assert:
-    that:
-      - readpass == newpass
+    - name: Create dummy pass script
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          echo "shim_ok"
+        dest: "{{ passpath }}"
+        mode: '0755'
 
-- name: Fetch password from non-existing file using missing=empty
-  set_fact:
-    readpass: "{{ query('community.general.passwordstore', 'test-missing-pass missing=empty') }}"
+    - name: Try reading from non-existent passwordstore location with different pass utility
+      ansible.builtin.set_fact:
+        newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+      environment:
+        PATH: "/tmp"
 
-- name: Verify password
-  assert:
-    that:
-      - readpass == [ none ]
+    - name: Verify password received from shim
+      ansible.builtin.assert:
+        that:
+          - newpass == "shim_ok"
 
-# As inserting multiline passwords on the commandline would require something
-# like expect, simply create it by using default gpg on a file with the correct
-# structure.
-- name: Create the YAML password content
-  copy:
-    dest: "~/.password-store/test-yaml-pass"
-    content: |
-      testpassword
-      key: |
-        multi
-        line
+    - name: Try to read folder as passname with a different pass utility
+      ansible.builtin.set_fact:
+        newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
-- name: Read .gpg-id from .password-store
-  set_fact:
-    gpgid: "{{ lookup('file', '~/.password-store/.gpg-id') }}"
+    - name: Verify password received from shim
+      ansible.builtin.assert:
+        that:
+          - newpass == "shim_ok"
 
-- name: Encrypt the file using the gpg key
-  command: "{{ gpg2_bin }} --batch --encrypt -r {{ gpgid }} ~/.password-store/test-yaml-pass"
+  always:
+    - name: Move original pass back into place
+      ansible.builtin.command:
+        argv:
+          - mv
+          - "{{ passpath }}.testorig"
+          - "{{ passpath }}"
+      args:
+        removes: "{{ passpath }}.testorig"
 
-- name: Fetch a password with YAML subkey
-  set_fact:
-    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-yaml-pass subkey=key') }}"
+# This are in addition to the real gopass tests above
+# and verify plugin logic
+- name: gopass plugin logic tests
+  vars:
+    passwordstore_backend: "gopass"
+  block:
+    - name: Check if gopass executable exists
+      ansible.builtin.stat:
+        path: "{{ gopasspath }}"
+      register: gopass_check
 
-- name: Read a yaml subkey
-  assert:
-    that:
-      - readyamlpass == 'multi\nline'
+    - name: Move original gopass out of the way
+      ansible.builtin.command:
+        argv:
+          - mv
+          - "{{ gopasspath }}"
+          - "{{ gopasspath }}.testorig"
+      args:
+        creates: "{{ gopasspath }}.testorig"
+      when: gopass_check.stat.exists == true
 
-- name: Create a non-YAML multiline file
-  copy:
-    dest: "~/.password-store/test-multiline-pass"
-    content: |
-      testpassword
-      random additional line
+    - name: Create mocked gopass script
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          if [ "$GOPASS_NO_REMINDER" != "YES" ]; then
+            exit 1
+          fi
+          if [ "$1" = "--version" ]; then
+            exit 2
+          fi
+          if [ "$1" = "ls" ]; then
+            echo "folder"
+            exit 0
+          fi
+          echo "gopass_ok"
+        dest: "{{ gopasspath }}"
+        mode: '0755'
 
-- name: Read .gpg-id from .password-store
-  set_fact:
-    gpgid: "{{ lookup('file', '~/.password-store/.gpg-id') }}"
+    - name: Try to read passname without .gpg file using gopass mock
+      ansible.builtin.set_fact:
+        newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
-- name: Encrypt the file using the gpg key
-  command: "{{ gpg2_bin }} --batch --encrypt -r {{ gpgid }} ~/.password-store/test-multiline-pass"
+    - name: Verify password received from gopass mock
+      ansible.builtin.assert:
+        that:
+          - newpass == "gopass_ok"
 
-- name: Fetch password from multiline file
-  set_fact:
-    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-multiline-pass') }}"
+  always:
+    - name: Remove mocked gopass
+      ansible.builtin.file:
+        path: "{{ gopasspath }}"
+        state: absent
 
-- name: Multiline pass only returns first line
-  assert:
-    that:
-      - readyamlpass == 'testpassword'
-
-- name: Fetch all from multiline file
-  set_fact:
-    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-multiline-pass returnall=yes') }}"
-
-- name: Multiline pass returnall returns everything in the file
-  assert:
-    that:
-      - readyamlpass == 'testpassword\nrandom additional line'
+    - name: Move original gopass back into place
+      ansible.builtin.command:
+        argv:
+          - mv
+          - "{{ gopasspath }}.testorig"
+          - "{{ gopasspath }}"
+      args:
+        removes: "{{ gopasspath }}.testorig"
+      when: gopass_check.stat.exists == true

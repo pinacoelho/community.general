@@ -1,26 +1,29 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
 # test code for the one_template module
-
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # ENVIRONMENT PREPARATION
 
 - name: "copy fixtures to test host"
-  copy:
+  ansible.builtin.copy:
     src: testhost/tmp/opennebula-fixtures.json.gz
     dest: /tmp
   when:
-    - opennebula_test_fixture
-    - opennebula_test_fixture_replay
+    - opennebula_test_fixture | bool
+    - opennebula_test_fixture_replay | bool
 
 
 # Create a new template
 
 - name: "Create a new TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -65,15 +68,15 @@
   register: result
 
 - name: "assert that creation worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is changed
+      - result is changed
 
 
 # Updating a template
 
 - name: "Update an existing TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -118,12 +121,12 @@
   register: result
 
 - name: "assert that it updated the template"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is changed
+      - result is changed
 
 - name: "Update an existing TEMPLATE with the same changes again"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -168,15 +171,15 @@
   register: result
 
 - name: "assert that there was no change"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is not changed
+      - result is not changed
 
 
 # Deletion of templates
 
 - name: "Delete a nonexisting TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -190,12 +193,12 @@
   register: result
 
 - name: "assert that there was no change"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is not changed
+      - result is not changed
 
 - name: "Delete an existing TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -209,15 +212,15 @@
   register: result
 
 - name: "assert that there was a change"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is changed
+      - result is changed
 
 
 # Usage without `template` parameter
 
 - name: "Try to create use one_template with state=present and without the template parameter"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -227,17 +230,17 @@
   ignore_errors: true
 
 - name: "assert that it failed because template is missing"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is failed
+      - result is failed
 
 
 # TEARDOWN
 
 - name: "fetch fixtures"
-  fetch:
+  ansible.builtin.fetch:
     src: /tmp/opennebula-fixtures.json.gz
     dest: targets/one_host/files
   when:
-    - opennebula_test_fixture
-    - not opennebula_test_fixture_replay
+    - opennebula_test_fixture | bool
+    - not (opennebula_test_fixture_replay | bool)

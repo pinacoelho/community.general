@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Ensure snap 'hello-world' is not installed
   community.general.snap:
     name: hello-world
@@ -37,14 +41,14 @@
   register: alias_single_3
 
 - name: assert single alias
-  assert:
+  ansible.builtin.assert:
     that:
-        - alias_single_0 is changed
-        - alias_single_1 is changed
-        - alias_single_2 is not changed
-        - alias_single_3 is not changed
-        - 'alias_single_1.snap_aliases["hello-world"] == ["hw"]'
-        - 'alias_single_3.snap_aliases["hello-world"] == ["hw"]'
+      - alias_single_0 is changed
+      - alias_single_1 is changed
+      - alias_single_2 is not changed
+      - alias_single_3 is not changed
+      - 'alias_single_1.snap_aliases["hello-world"] == ["hw"]'
+      - 'alias_single_3.snap_aliases["hello-world"] == ["hw"]'
 
 - name: Create multiple aliases (check mode)
   community.general.snap_alias:
@@ -73,14 +77,14 @@
   register: alias_multi_3
 
 - name: assert multi alias
-  assert:
+  ansible.builtin.assert:
     that:
-        - alias_multi_0 is changed
-        - alias_multi_1 is changed
-        - alias_multi_2 is not changed
-        - alias_multi_3 is not changed
-        - 'alias_multi_1.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
-        - 'alias_multi_3.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
+      - alias_multi_0 is changed
+      - alias_multi_1 is changed
+      - alias_multi_2 is not changed
+      - alias_multi_3 is not changed
+      - 'alias_multi_1.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
+      - 'alias_multi_3.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
 
 - name: Remove one specific alias (check mode)
   community.general.snap_alias:
@@ -109,14 +113,14 @@
   register: alias_remove_3
 
 - name: assert remove alias
-  assert:
+  ansible.builtin.assert:
     that:
-        - alias_remove_0 is changed
-        - alias_remove_1 is changed
-        - alias_remove_2 is not changed
-        - alias_remove_3 is not changed
-        - 'alias_remove_1.snap_aliases["hello-world"] == ["hw2", "hw3"]'
-        - 'alias_remove_3.snap_aliases["hello-world"] == ["hw2", "hw3"]'
+      - alias_remove_0 is changed
+      - alias_remove_1 is changed
+      - alias_remove_2 is not changed
+      - alias_remove_3 is not changed
+      - 'alias_remove_1.snap_aliases["hello-world"] == ["hw2", "hw3"]'
+      - 'alias_remove_3.snap_aliases["hello-world"] == ["hw2", "hw3"]'
 
 - name: Remove all aliases for snap (check mode)
   community.general.snap_alias:
@@ -145,11 +149,11 @@
   register: alias_remove_all_3
 
 - name: assert remove_all alias
-  assert:
+  ansible.builtin.assert:
     that:
-        - alias_remove_all_0 is changed
-        - alias_remove_all_1 is changed
-        - alias_remove_all_2 is not changed
-        - alias_remove_all_3 is not changed
-        - 'alias_remove_all_1.snap_aliases["hello-world"] == []'
-        - 'alias_remove_all_3.snap_aliases["hello-world"] == []'
+      - alias_remove_all_0 is changed
+      - alias_remove_all_1 is changed
+      - alias_remove_all_2 is not changed
+      - alias_remove_all_3 is not changed
+      - 'alias_remove_all_1.snap_aliases["hello-world"] == []'
+      - 'alias_remove_all_3.snap_aliases["hello-world"] == []'

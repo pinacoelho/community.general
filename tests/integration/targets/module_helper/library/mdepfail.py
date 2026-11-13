@@ -1,13 +1,12 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: mdepfail
 author: "Alexei Znamensky (@russoz)"
 short_description: Simple module for testing
@@ -23,41 +22,42 @@ options:
   c:
     description: cccc
     type: str
-'''
+"""
 
 EXAMPLES = ""
 
 RETURN = ""
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible.module_utils.basic import missing_required_lib
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
-with ModuleHelper.dependency("nopackagewiththisname", missing_required_lib("nopackagewiththisname")):
-    import nopackagewiththisname
+with deps.declare("nopackagewiththisname"):
+    import nopackagewiththisname  # noqa: F401, pylint: disable=unused-import # type: ignore[import-not-found]
 
 
 class MSimple(ModuleHelper):
-    output_params = ('a', 'b', 'c')
+    output_params = ("a", "b", "c")
     module = dict(
         argument_spec=dict(
-            a=dict(type='int'),
-            b=dict(type='str'),
-            c=dict(type='str'),
+            a=dict(type="int"),
+            b=dict(type="str"),
+            c=dict(type="str"),
         ),
     )
 
     def __init_module__(self):
-        self.vars.set('value', None)
-        self.vars.set('abc', "abc", diff=True)
+        self.vars.set("value", None)
+        self.vars.set("abc", "abc", diff=True)
+        deps.validate(self.module)
 
     def __run__(self):
         if (0 if self.vars.a is None else self.vars.a) >= 100:
             raise Exception("a >= 100")
         if self.vars.c == "abc change":
-            self.vars['abc'] = "changed abc"
-        if self.vars.get('a', 0) == 2:
-            self.vars['b'] = str(self.vars.b) * 2
-            self.vars['c'] = str(self.vars.c) * 2
+            self.vars["abc"] = "changed abc"
+        if self.vars.a == 2:
+            self.vars["b"] = str(self.vars.b) * 2
+            self.vars["c"] = str(self.vars.c) * 2
 
 
 def main():
@@ -65,5 +65,5 @@ def main():
     msimple.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

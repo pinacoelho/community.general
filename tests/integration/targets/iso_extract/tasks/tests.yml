@@ -1,52 +1,59 @@
+---
 # Test code for the iso_extract module.
-# (c) 2017, James Tanner <tanner.jc@gmail.com>
-# (c) 2017, Dag Wieers <dag@wieers.com>
-
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) 2017, James Tanner <tanner.jc@gmail.com>
+# Copyright (c) 2017, Dag Wieers <dag@wieers.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Extract the iso
-  iso_extract:
+  community.general.iso_extract:
     image: '{{ output_test_dir }}/test.iso'
     dest: '{{ output_test_dir }}'
     files:
-    - 1.txt
-    - 2.txt
+      - 1.txt
+      - 2.txt
+    executable: '{{ iso_extract_7zip_executable | default(omit) }}'
   register: iso_extract_test0
 
-- assert:
+- ansible.builtin.assert:
     that:
-    - iso_extract_test0 is changed
+      - iso_extract_test0 is changed
 
 - name: Extract the iso again
-  iso_extract:
+  community.general.iso_extract:
     image: '{{ output_test_dir }}/test.iso'
     dest: '{{ output_test_dir }}'
     files:
-    - 1.txt
-    - 2.txt
+      - 1.txt
+      - 2.txt
+    executable: '{{ iso_extract_7zip_executable | default(omit) }}'
   register: iso_extract_test0_again
 
 - name: Test iso_extract_test0_again (normal mode)
-  assert:
+  ansible.builtin.assert:
     that:
-    - iso_extract_test0_again is not changed
+      - iso_extract_test0_again is not changed
   when: not in_check_mode
 
 - name: Test iso_extract_test0_again (check-mode)
-  assert:
+  ansible.builtin.assert:
     that:
-    - iso_extract_test0_again is changed
+      - iso_extract_test0_again is changed
   when: in_check_mode
+
+- name: Extract the iso using files with leading slash
+  community.general.iso_extract:
+    image: '{{ output_test_dir }}/test.iso'
+    dest: '{{ output_test_dir }}'
+    files:
+      - /1.txt
+      - /2.txt
+    force: true
+    executable: '{{ iso_extract_7zip_executable | default(omit) }}'
+  register: iso_extract_leading_slash
+
+- name: Test iso_extract with leading slash succeeds (normal mode)
+  ansible.builtin.assert:
+    that:
+      - iso_extract_leading_slash is not failed
+  when: not in_check_mode

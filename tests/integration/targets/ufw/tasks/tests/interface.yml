@@ -1,11 +1,16 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Enable
-  ufw:
+  community.general.ufw:
     state: enabled
 
 - name: Route with interface in and out
-  ufw:
+  community.general.ufw:
     rule: allow
-    route: yes
+    route: true
     interface_in: foo
     interface_out: bar
     proto: tcp
@@ -15,25 +20,25 @@
     to_port: 2222
 
 - name: Route with interface in
-  ufw:
+  community.general.ufw:
     rule: allow
-    route: yes
+    route: true
     interface_in: foo
     proto: tcp
     from_ip: 1.1.1.1
     from_port: 1111
 
 - name: Route with interface out
-  ufw:
+  community.general.ufw:
     rule: allow
-    route: yes
+    route: true
     interface_out: bar
     proto: tcp
     from_ip: 1.1.1.1
     from_port: 1111
 
 - name: Non-route with interface in
-  ufw:
+  community.general.ufw:
     rule: allow
     interface_in: foo
     proto: tcp
@@ -41,7 +46,7 @@
     from_port: 3333
 
 - name: Non-route with interface out
-  ufw:
+  community.general.ufw:
     rule: allow
     interface_out: bar
     proto: tcp
@@ -49,10 +54,10 @@
     from_port: 4444
 
 - name: Check result
-  shell: ufw status |grep -E '(ALLOW|DENY|REJECT|LIMIT)' |sed -E 's/[ \t]+/ /g'
+  ansible.builtin.shell: ufw status |grep -E '(ALLOW|DENY|REJECT|LIMIT)' |sed -E 's/[ \t]+/ /g'
   register: ufw_status
 
-- assert:
+- ansible.builtin.assert:
     that:
       - '"8.8.8.8 2222/tcp on bar ALLOW FWD 1.1.1.1 1111/tcp on foo " in stdout'
       - '"Anywhere ALLOW FWD 1.1.1.1 1111/tcp on foo " in stdout'
@@ -63,7 +68,7 @@
     stdout: '{{ ufw_status.stdout_lines }}'
 
 - name: Non-route with interface_in and interface_out
-  ufw:
+  community.general.ufw:
     rule: allow
     interface_in: foo
     interface_out: bar
@@ -72,10 +77,10 @@
     from_port: 1111
     to_ip: 8.8.8.8
     to_port: 2222
-  ignore_errors: yes
+  ignore_errors: true
   register: ufw_non_route_iface
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ufw_non_route_iface is failed
       - '"Only route rules" in ufw_non_route_iface.msg'

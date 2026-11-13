@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Check that the module works with symlinks, as expected, i.e. as dd does:
 # follow symlinks.
 
@@ -9,12 +13,11 @@
 
 - name: Create a broken symlink in the same directory
   ansible.builtin.file:
-    src:  "{{ filesize_testfile | basename }}"
+    src: "{{ filesize_testfile | basename }}"
     dest: "{{ filesize_testlink }}"
     state: link
-    force: yes
-    follow: no
-
+    force: true
+    follow: false
 
 
 - name: Create a file with a size of 512 kB (512000 bytes) (check mode)
@@ -22,7 +25,7 @@
     path: "{{ filesize_testlink }}"
     size: "512 kB"
   register: filesize_test_symlink_01
-  check_mode: yes
+  check_mode: true
 
 - name: Create a file with a size of 512 kB (512000 bytes)
   community.general.filesize:
@@ -41,7 +44,7 @@
     path: "{{ filesize_testlink }}"
     size: "500 KiB"
   register: filesize_test_symlink_03
-  check_mode: yes
+  check_mode: true
 
 - name: Create a file with a size of 500 KiB (512000 bytes) (idempotency)
   community.general.filesize:
@@ -79,7 +82,6 @@
 
       - filesize_test_symlink_04.path == filesize_test_symlink_02.path
       - filesize_test_symlink_04.path != filesize_testlink
-
 
 
 - name: Remove test file

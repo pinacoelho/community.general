@@ -1,47 +1,32 @@
-# -*- coding: utf-8 -*-
-# (c) 2015, Filipe Niero Felisbino <filipenf@gmail.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) 2015, Filipe Niero Felisbino <filipenf@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-  name: json_query
-  short_description: Select a single element or a data subset from a complex data structure
-  description:
-    - This filter lets you query a complex JSON structure and iterate over it using a loop structure.
-  positional: expr
-  options:
-    _input:
-      description:
-        - The JSON data to query.
-      type: any
-      required: true
-    expr:
-      description:
-        - The query expression.
-        - See U(http://jmespath.org/examples.html) for examples.
-      type: string
-      required: true
-  requirements:
-    - jmespath
-'''
+DOCUMENTATION = r"""
+name: json_query
+short_description: Select a single element or a data subset from a complex data structure
+description:
+  - This filter lets you query a complex JSON structure and iterate over it using a loop structure.
+positional: expr
+options:
+  _input:
+    description:
+      - The JSON data to query.
+    type: any
+    required: true
+  expr:
+    description:
+      - The query expression.
+      - See U(http://jmespath.org/examples.html) for examples.
+    type: string
+    required: true
+requirements:
+  - jmespath
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Define data to work on in the examples below
   ansible.builtin.set_fact:
     domain_definition:
@@ -112,49 +97,58 @@ EXAMPLES = '''
     msg: "{{ domain_definition | to_json | from_json | community.general.json_query(server_name_query) }}"
   vars:
     server_name_query: "domain.server[?contains(name,'server1')].port"
-'''
+"""
 
-RETURN = '''
-  _value:
-    description: The result of the query.
-    type: any
-'''
+RETURN = r"""
+_value:
+  description: The result of the query.
+  type: any
+"""
 
 from ansible.errors import AnsibleError, AnsibleFilterError
 
 try:
     import jmespath
+
     HAS_LIB = True
 except ImportError:
     HAS_LIB = False
 
 
 def json_query(data, expr):
-    '''Query data using jmespath query language ( http://jmespath.org ). Example:
+    """Query data using jmespath query language ( http://jmespath.org ). Example:
     - ansible.builtin.debug: msg="{{ instance | json_query(tagged_instances[*].block_device_mapping.*.volume_id') }}"
-    '''
+    """
     if not HAS_LIB:
-        raise AnsibleError('You need to install "jmespath" prior to running '
-                           'json_query filter')
+        raise AnsibleError('You need to install "jmespath" prior to running json_query filter')
 
     # Hack to handle Ansible Unsafe text, AnsibleMapping and AnsibleSequence
-    # See issue: https://github.com/ansible-collections/community.general/issues/320
-    jmespath.functions.REVERSE_TYPES_MAP['string'] = jmespath.functions.REVERSE_TYPES_MAP['string'] + ('AnsibleUnicode', 'AnsibleUnsafeText', )
-    jmespath.functions.REVERSE_TYPES_MAP['array'] = jmespath.functions.REVERSE_TYPES_MAP['array'] + ('AnsibleSequence', )
-    jmespath.functions.REVERSE_TYPES_MAP['object'] = jmespath.functions.REVERSE_TYPES_MAP['object'] + ('AnsibleMapping', )
+    # See issues https://github.com/ansible-collections/community.general/issues/320
+    # and https://github.com/ansible/ansible/issues/85600.
+    jmespath.functions.REVERSE_TYPES_MAP["string"] = jmespath.functions.REVERSE_TYPES_MAP["string"] + (
+        "AnsibleUnicode",
+        "AnsibleUnsafeText",
+        "_AnsibleTaggedStr",
+    )
+    jmespath.functions.REVERSE_TYPES_MAP["array"] = jmespath.functions.REVERSE_TYPES_MAP["array"] + (
+        "AnsibleSequence",
+        "_AnsibleLazyTemplateList",
+    )
+    jmespath.functions.REVERSE_TYPES_MAP["object"] = jmespath.functions.REVERSE_TYPES_MAP["object"] + (
+        "AnsibleMapping",
+        "_AnsibleLazyTemplateDict",
+    )
     try:
         return jmespath.search(expr, data)
     except jmespath.exceptions.JMESPathError as e:
-        raise AnsibleFilterError('JMESPathError in json_query filter plugin:\n%s' % e)
+        raise AnsibleFilterError(f"JMESPathError in json_query filter plugin:\n{e}") from e
     except Exception as e:
         # For older jmespath, we can get ValueError and TypeError without much info.
-        raise AnsibleFilterError('Error in jmespath.search in json_query filter plugin:\n%s' % e)
+        raise AnsibleFilterError(f"Error in jmespath.search in json_query filter plugin:\n{e}") from e
 
 
-class FilterModule(object):
-    ''' Query filter '''
+class FilterModule:
+    """Query filter"""
 
     def filters(self):
-        return {
-            'json_query': json_query
-        }
+        return {"json_query": json_query}

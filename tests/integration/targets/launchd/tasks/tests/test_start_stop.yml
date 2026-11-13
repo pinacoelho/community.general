@@ -1,33 +1,36 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service in check mode"
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result_check_mode"
-  check_mode: yes
+  check_mode: true
 
 
 - name: "[{{ item }}] Validate that service was started in check mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_start_result_check_mode is success
       - test_1_launchd_start_result_check_mode is changed
 
 
 - name: "[{{ item }}] Given a started service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result"
 
 
 - name: "[{{ item }}] Validate that service was started"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_start_result is success
       - test_1_launchd_start_result is changed
@@ -40,14 +43,14 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a stopped service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: stopped
-  become: yes
+  become: true
   register: "test_2_launchd_stop_result"
 
 - name: "[{{ item }}] Validate that service was stopped after it was started"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_2_launchd_stop_result is success
       - test_2_launchd_stop_result is changed
@@ -59,14 +62,14 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a stopped service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: stopped
-  become: yes
+  become: true
   register: "test_3_launchd_stop_result"
 
 - name: "[{{ item }}] Validate that service can be stopped after being already stopped"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_3_launchd_stop_result is success
       - not test_3_launchd_stop_result is changed
@@ -78,14 +81,14 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_4_launchd_start_result"
 
 - name: "[{{ item }}] Validate that service was started..."
-  assert:
+  ansible.builtin.assert:
     that:
       - test_4_launchd_start_result is success
       - test_4_launchd_start_result is changed
@@ -96,14 +99,14 @@
       - test_4_launchd_start_result.status.status_code == '0'
 
 - name: "[{{ item }}] And when service is started again..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_5_launchd_start_result"
 
 - name: "[{{ item }}] Validate that service is still in the same state as before"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_5_launchd_start_result is success
       - not test_5_launchd_start_result is changed

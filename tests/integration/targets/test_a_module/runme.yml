@@ -1,7 +1,12 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - hosts: localhost
   tasks:
     - name: Test a_module
-      assert:
+      ansible.builtin.assert:
         that:
           # Modules/actions that do not exist
           - "'foo_bar' is not community.general.a_module"
@@ -25,7 +30,7 @@
           - "'testns.testcoll.foobar' is not community.general.a_module"
 
     - name: Test a_module in case of routing
-      assert:
+      ansible.builtin.assert:
         that:
           # Redirected module
           - "'ufw' is community.general.a_module"
@@ -34,4 +39,3 @@
           - "'onyx_pfc_interface' is not community.general.a_module"
           # Tombstoned module
           - "'community.general.docker_image_facts' is not community.general.a_module"
-      when: ansible_version.string is version('2.10.0', '>=')

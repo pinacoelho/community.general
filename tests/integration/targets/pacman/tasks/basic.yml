@@ -1,39 +1,43 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - vars:
     package_name: unarj
   block:
     - name: Make sure that {{ package_name }} is not installed
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
 
     - name: Install {{ package_name }} (check mode)
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
       check_mode: true
       register: install_1
 
     - name: Install {{ package_name }}
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
       register: install_2
 
     - name: Install {{ package_name }} (check mode, idempotent)
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
       check_mode: true
       register: install_3
 
     - name: Install {{ package_name }} (idempotent)
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
       register: install_4
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - install_1 is changed
           - install_1.msg == 'Would have installed 1 packages'
@@ -45,32 +49,32 @@
           - install_4.msg == 'package(s) already installed'
 
     - name: Uninstall {{ package_name }} (check mode)
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
       check_mode: true
       register: uninstall_1
 
     - name: Uninstall {{ package_name }}
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
       register: uninstall_2
 
     - name: Uninstall {{ package_name }} (check mode, idempotent)
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
       check_mode: true
       register: uninstall_3
 
     - name: Uninstall {{ package_name }} (idempotent)
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
       register: uninstall_4
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - uninstall_1 is changed
           - uninstall_1.msg == 'Would have removed 1 packages'

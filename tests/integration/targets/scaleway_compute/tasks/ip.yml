@@ -1,6 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Create a server with no IP (Check)
-  check_mode: yes
-  scaleway_compute:
+  check_mode: true
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -11,15 +16,16 @@
 
   register: server_creation_absent_check_task
 
-- debug: var=server_creation_absent_check_task
+- ansible.builtin.debug:
+    var: server_creation_absent_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_absent_check_task is success
       - server_creation_absent_check_task is changed
 
 - name: Create a server
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -31,15 +37,16 @@
 
   register: server_creation_absent_task
 
-- debug: var=server_creation_absent_task
+- ansible.builtin.debug:
+    var: server_creation_absent_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_absent_task is success
       - server_creation_absent_task is changed
 
 - name: Create a server (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -51,9 +58,10 @@
 
   register: server_creation_absent_confirmation_task
 
-- debug: var=server_creation_absent_confirmation_task
+- ansible.builtin.debug:
+    var: server_creation_absent_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_absent_confirmation_task is success
       - server_creation_absent_confirmation_task is not changed
@@ -61,8 +69,8 @@
 # Add a dynamic IP to the instance
 
 - name: Patch server tags (Check)
-  check_mode: yes
-  scaleway_compute:
+  check_mode: true
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: dynamic
@@ -73,15 +81,16 @@
 
   register: ip_patching_check_task
 
-- debug: var=ip_patching_check_task
+- ansible.builtin.debug:
+    var: ip_patching_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ip_patching_check_task is success
       - ip_patching_check_task is changed
 
 - name: Patch server tags
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: dynamic
@@ -92,15 +101,16 @@
     wait: true
   register: ip_patching_task
 
-- debug: var=ip_patching_task
+- ansible.builtin.debug:
+    var: ip_patching_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ip_patching_task is success
       - ip_patching_task is changed
 
 - name: Patch server tags (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: dynamic
@@ -112,9 +122,10 @@
 
   register: ip_patching_confirmation_task
 
-- debug: var=ip_patching_confirmation_task
+- ansible.builtin.debug:
+    var: ip_patching_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ip_patching_confirmation_task is success
       - ip_patching_confirmation_task is not changed
@@ -122,8 +133,8 @@
 # Remove dynamic IP
 
 - name: Patch server tags (Check)
-  check_mode: yes
-  scaleway_compute:
+  check_mode: true
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -134,15 +145,16 @@
 
   register: remove_ip_check_task
 
-- debug: var=remove_ip_check_task
+- ansible.builtin.debug:
+    var: remove_ip_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_ip_check_task is success
       - remove_ip_check_task is changed
 
 - name: Patch server tags
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -154,15 +166,16 @@
 
   register: remove_ip_task
 
-- debug: var=remove_ip_task
+- ansible.builtin.debug:
+    var: remove_ip_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_ip_task is success
       - remove_ip_task is changed
 
 - name: Patch server tags (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -174,15 +187,16 @@
 
   register: remove_ip_confirmation_task
 
-- debug: var=remove_ip_confirmation_task
+- ansible.builtin.debug:
+    var: remove_ip_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_ip_confirmation_task is success
       - remove_ip_confirmation_task is not changed
 
 - name: Destroy it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: absent
     image: '{{ scaleway_image_id }}'
@@ -193,9 +207,10 @@
 
   register: server_destroy_task
 
-- debug: var=server_destroy_task
+- ansible.builtin.debug:
+    var: server_destroy_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_destroy_task is success
       - server_destroy_task is changed

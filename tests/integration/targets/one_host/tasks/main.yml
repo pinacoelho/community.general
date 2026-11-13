@@ -1,30 +1,35 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
 # test code for the one_host module
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
+# ENVIRONMENT PREPARACTION
 
-# ENVIRONENT PREPARACTION
-
-- set_fact: test_number= 0
+- ansible.builtin.set_fact:
+    test_number: 0
 
 - name: "test_{{test_number}}: copy fixtures to test host"
-  copy:
+  ansible.builtin.copy:
     src: testhost/tmp/opennebula-fixtures.json.gz
     dest: /tmp
   when:
-    - opennebula_test_fixture
-    - opennebula_test_fixture_replay
+    - opennebula_test_fixture | bool
+    - opennebula_test_fixture_replay | bool
 
 
 # SETUP INITIAL TESTING CONDITION
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: ensure the tests hosts are absent"
-  one_host:
+  community.general.one_host:
     name: "{{ item }}"
     state: absent
     api_endpoint: "{{ opennebula_url }}"
@@ -41,10 +46,11 @@
 
 # NOT EXISTING HOSTS
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: attempt to enable a host that does not exists"
-  one_host:
+  community.general.one_host:
     name: badhost
     state: "{{item}}"
     api_url: "{{ opennebula_url }}"
@@ -64,17 +70,18 @@
     - offline
 
 - name: "assert test_{{test_number}} failed"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is failed
-    - result.results[0].msg == 'invalid host state ERROR'
+      - result is failed
+      - result.results[0].msg == 'invalid host state ERROR'
 
 # ---
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: delete an unexisting host"
-  one_host:
+  community.general.one_host:
     name: badhost
     state: absent
     validate_certs: false
@@ -89,17 +96,18 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result.changed
+      - result is changed
 
 # HOST ENABLEMENT
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 
 - name: "test_{{test_number}}: enable the test hosts"
-  one_host:
+  community.general.one_host:
     name: "{{ item }}"
     state: enabled
     api_url: "{{ opennebula_url }}"
@@ -115,16 +123,17 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result.changed
+      - result is changed
 
 # TEMPLATE MANAGEMENT
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: setup template values on hosts"
-  one_host:
+  community.general.one_host:
     name: "{{ item }}"
     state: enabled
     api_url: "{{ opennebula_url }}"
@@ -145,16 +154,17 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result.changed
+      - result is changed
 
 # ---
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: setup equivalent template values on hosts"
-  one_host:
+  community.general.one_host:
     name: "{{ item }}"
     state: enabled
     api_url: "{{ opennebula_url }}"
@@ -175,16 +185,17 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result is not changed
+      - result is not changed
 
 # HOST DISABLEMENT
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: disable the test hosts"
-  one_host:
+  community.general.one_host:
     name: "{{ item }}"
     state: disabled
     api_url: "{{ opennebula_url }}"
@@ -200,16 +211,17 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result.changed
+      - result is changed
 
 # HOST OFFLINE
 
-- set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: offline the test hosts"
-  one_host:
+  community.general.one_host:
     name: "{{ item }}"
     state: offline
     api_url: "{{ opennebula_url }}"
@@ -225,16 +237,16 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
-    - result.changed
+      - result is changed
 
 # TEARDOWN
 
 - name: fetch fixtures
-  fetch:
+  ansible.builtin.fetch:
     src: /tmp/opennebula-fixtures.json.gz
     dest: targets/one_host/files
   when:
-    - opennebula_test_fixture
-    - not opennebula_test_fixture_replay
+    - opennebula_test_fixture | bool
+    - not (opennebula_test_fixture_replay | bool)

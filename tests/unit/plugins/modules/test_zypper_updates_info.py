@@ -1,0 +1,22 @@
+# Copyright (c) 2026, Harshvardhan Sharma <harshvardhan.sharma@suse.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+from ansible_collections.community.general.plugins.modules import zypper_updates_info
+
+from .uthelper import RunCommandMock, TestCaseMock, UTHelper
+
+
+class WarningContainsMock(TestCaseMock):
+    name = "warning_contains"
+
+    def setup(self, mocker):
+        pass
+
+    def check(self, test_case, results):
+        assert self.mock_specs["text"] in str(results.get("warnings", []))
+
+
+UTHelper.from_module(zypper_updates_info, __name__, mocks=[RunCommandMock, WarningContainsMock])

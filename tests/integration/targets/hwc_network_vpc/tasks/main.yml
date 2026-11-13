@@ -4,6 +4,10 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # ----------------------------------------------------------------------------
 #
 #     ***     AUTO GENERATED CODE    ***    AUTO GENERATED CODE     ***
@@ -19,83 +23,83 @@
 # ----------------------------------------------------------------------------
 # Pre-test setup
 - name: delete a vpc
-  hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: absent
-#----------------------------------------------------------
+  community.general.hwc_network_vpc:
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: absent
+# ----------------------------------------------------------
 - name: create a vpc
-  hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: present
+  community.general.hwc_network_vpc:
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: present
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 # ----------------------------------------------------------------------------
 - name: create a vpc that already exists
-  hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: present
+  community.general.hwc_network_vpc:
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: present
   register: result
 - name: assert changed is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a vpc
-  hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: absent
+  community.general.hwc_network_vpc:
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: absent
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 # ----------------------------------------------------------------------------
 - name: delete a vpc that does not exist
-  hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: absent
+  community.general.hwc_network_vpc:
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: absent
   register: result
 - name: assert changed is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed

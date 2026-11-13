@@ -1,7 +1,12 @@
+..
+  Copyright (c) Ansible Project
+  GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+  SPDX-License-Identifier: GPL-3.0-or-later
+
 Counting elements in a sequence
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``community.general.counter`` filter plugin allows you to count (hashable) elements in a sequence. Elements are returned as dictionary keys and their counts are stored as dictionary values.
+The :ansplugin:`community.general.counter filter plugin <community.general.counter#filter>` allows you to count (hashable) elements in a sequence. Elements are returned as dictionary keys and their counts are stored as dictionary values.
 
 .. code-block:: yaml+jinja
 
@@ -14,6 +19,17 @@ The ``community.general.counter`` filter plugin allows you to count (hashable) e
         msg: "{{ ['car', 'car', 'bike', 'plane', 'bike'] | community.general.counter }}"
 
 This produces:
+
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
 
 .. code-block:: ansible-output
 
@@ -67,9 +83,20 @@ This plugin is useful for selecting resources based on current allocation:
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with the least disks]
+    TASK [Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with the least disks] ***
     ok: [localhost] => {
         "msg": "scsi_2"
     }
